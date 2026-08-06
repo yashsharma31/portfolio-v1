@@ -32,11 +32,9 @@ export async function GET() {
     }));
 
     return NextResponse.json(posts);
-  } catch (error) {
-    console.error("Error fetching Medium posts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch posts" },
-      { status: 500 }
-    );
+  } catch {
+    // Soft-fail so the Writing section can show its profile fallback
+    // without spamming the browser console with a 500.
+    return NextResponse.json([]);
   }
 }

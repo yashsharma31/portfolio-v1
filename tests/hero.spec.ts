@@ -1,26 +1,30 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("hero", () => {
-  test("poster is present and canvas mounts without errors", async ({ page }) => {
+  test("artwork is present and organism canvas mounts without errors", async ({
+    page,
+  }) => {
     const errors: string[] = [];
     page.on("pageerror", (err) => errors.push(err.message));
 
     await page.goto("/");
-    await expect(page.locator('img[src*="hero-poster"]')).toBeVisible();
+    await expect(page.locator("img[data-hero-art]")).toBeVisible();
 
-    // Canvas should attach a <canvas> element (WebGL available in Chromium).
-    await expect(page.locator("[data-hero-canvas] canvas")).toHaveCount(1, {
+    // HeroCanvas retired (B2) — portrait dissolve lives on the global organism.
+    await expect(page.locator("[data-hero-canvas]")).toHaveCount(0);
+    await expect(page.locator("[data-ember-field] canvas")).toHaveCount(1, {
       timeout: 15_000,
     });
     expect(errors).toEqual([]);
   });
 
-  test("reduced motion shows static poster only", async ({ page }) => {
+  test("reduced motion shows static artwork only", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await expect(page.locator('img[src*="hero-poster"]')).toBeVisible();
+    await expect(page.locator("img[data-hero-art]")).toBeVisible();
     await page.waitForTimeout(1500);
-    await expect(page.locator("[data-hero-canvas] canvas")).toHaveCount(0);
+    await expect(page.locator("[data-hero-canvas]")).toHaveCount(0);
+    await expect(page.locator("[data-ember-field]")).toHaveCount(0);
 
     // Entrance animation is disabled: headline fully visible immediately.
     const headline = page.getByRole("heading", { level: 1 });

@@ -14,14 +14,14 @@ export default function Hero() {
         className="relative mx-auto w-full max-w-[1200px] px-5 md:px-8"
         style={{ zIndex: "var(--z-content)" }}
       >
-        <div>
-          <h1 className="text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.95] tracking-tighter text-ink">
+        <div className="max-w-xl lg:max-w-[46%]">
+          <h1 className="text-[clamp(2.5rem,5vw,4.25rem)] font-extrabold leading-[0.98] tracking-tighter text-ink">
             <span className="hero-line">
               <span className="hero-line-inner">I build editors, canvases,</span>
             </span>
             <span className="hero-line">
               <span className="hero-line-inner [animation-delay:80ms]">
-                and interfaces that feel fast.
+                and interfaces that <span className="text-accent">feel fast.</span>
               </span>
             </span>
           </h1>

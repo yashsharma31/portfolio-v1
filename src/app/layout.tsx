@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/components/Navbar";
 import GrainOverlay from "@/components/GrainOverlay";
+import EmberFieldMount from "@/components/background/EmberFieldMount";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import { metadata } from "./metadata";
 import { CONTACT_LINKS } from "@/utils/constants";
@@ -45,6 +46,7 @@ export default function RootLayout({
       className={`${satoshi.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <body>
+        <EmberFieldMount />
         <Script
           id="schema-org"
           type="application/ld+json"
@@ -94,7 +96,9 @@ export default function RootLayout({
         </a>
         <SmoothScroll />
         <Navbar />
-        <main>{children}</main>
+        <main className="relative" style={{ zIndex: "var(--z-content)" }}>
+          {children}
+        </main>
         <GrainOverlay />
         <Analytics />
       </body>

@@ -39,7 +39,8 @@ test.describe("selected work", () => {
 
   test("verified metrics render in the Glue chapter", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("30%")).toBeAttached();
-    await expect(page.getByText("50%")).toBeAttached();
+    const work = page.getByRole("region", { name: "Selected work" });
+    await expect(work.getByText("30%", { exact: true })).toBeAttached();
+    await expect(work.getByText("50%", { exact: true })).toBeAttached();
   });
 });

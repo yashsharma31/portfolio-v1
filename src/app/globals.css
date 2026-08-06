@@ -130,3 +130,10 @@ p {
     opacity: 1;
   }
 }
+
+/* Hover motion only on fine pointers (PRD 3.5) */
+@media (hover: hover) and (pointer: fine) {
+  .group\/link:hover .hover-arrow {
+    transform: translateX(2px);
+  }
+}

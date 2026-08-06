@@ -196,6 +196,10 @@ Tokens are defined CSS-first in `globals.css` via Tailwind v4 `@theme` (e.g. `--
 
 ## 4. Information architecture (locked)
 
+> **Addendum (Aug 2026):** an approved ninth section, "Inside the black box" (`#ai`, between Experience and Writing), is specified in `docs/PRD-ai-journey.md`. It amends this table; build only on owner command.
+>
+> **Addendum 2 (Aug 2026):** the site-wide background upgrades to a persistent particle narrator ("the Ember Organism"), specified in `docs/PRD-background-organism.md`. Phased build, each phase on owner command.
+
 Single page, 8 sections, in this exact order. Anchor IDs preserve existing slugs for SEO where a section survives.
 
 | # | Section | Anchor | Layout family (all 8 must differ) |
@@ -223,17 +227,18 @@ Removed routes/sections: `/contact` page (301 redirect to `/#contact` via `next.
 
 ## 5. Signature interactive elements (the "new UX")
 
-### 5.1 Hero canvas (Pixi.js v8)
+### 5.1 Hero canvas (Pixi.js v8) — scroll-dissolve artwork
 
-The single most important build. An interactive particle field rendered in Pixi:
+> **Reworked Aug 2026 (owner decision):** Yash supplied a commissioned dark/ember illustration of himself surrounded by editor-UI motifs (`public/images/hero-art.jpg`). It replaces the halftone profile-photo treatment. The particle engine stayed; what it samples changed.
 
-- ~4,000-8,000 particles (device-tiered) forming a halftone portrait of Yash's profile photo (sampled from image luminance at build/load time).
-- Idle: particles breathe with subtle simplex-noise drift.
-- Pointer: particles within a 120px radius repel with spring return (velocity-based, not position-snapped). On touch: same behavior on drag.
-- On scroll past 30% of viewport: particles scatter along +y with opacity fade (scroll-linked, ScrollTrigger scrub or Pixi ticker fed by Lenis progress).
-- All particles tinted between `--text-tertiary` and `--accent` by sample brightness. The accent glow is the only color moment.
-- Engineering constraints: `dpr = min(devicePixelRatio, 2)`; `ticker` paused when hero is offscreen (IntersectionObserver) and when `document.hidden`; full `app.destroy()` cleanup on unmount; lazy-loaded via `next/dynamic` with `ssr: false`; a static PNG poster renders instantly and crossfades to canvas when ready (LCP is the poster + headline, never blocked by Pixi).
-- Fallbacks: `prefers-reduced-motion` → static poster only. Devices with `navigator.hardwareConcurrency <= 4` → particle count halved. WebGL unavailable → poster.
+The single most important build. The hero's right side (60% at `lg`) shows the illustration as a plain `next/image` (priority, the LCP element, edge-feathered with a CSS radial mask shared by image and canvas). Behind it, a Pixi particle field samples the *same artwork* into true-color particles:
+
+- Grid sampling at 128 cols (halved on `hardwareConcurrency <= 4`), cells below the artwork's dark-background luminance (`< 0.095`) skipped. Each particle keeps the sampled RGB as tint; alpha and radius scale with luminance (mid-tones boosted so the editor UI and mountains survive the dissolve).
+- **Scroll dissolve:** progress `p = scrollY / (0.65 * viewport)`. Over the first ~22% of `p` the crisp image crossfades into the particle rendering; particles then scatter *upward* (embers, 120-500px per particle) with x-jitter and the canvas fades out by `p = 1`. Fully reversible — scrolling back reforms the artwork.
+- Idle (any time canvas is visible): particles breathe with sine drift. Pointer within 110px repels with velocity-based spring return.
+- Engineering constraints: `dpr = min(devicePixelRatio, 2)`; ticker paused when hero is offscreen (IntersectionObserver) and when `document.hidden`; full `app.destroy()` cleanup on unmount; lazy-loaded via `next/dynamic` with `ssr: false`. LCP is the artwork `<img>` + headline, never blocked by Pixi.
+- Fallbacks: `prefers-reduced-motion` → static artwork only (no canvas mount). WebGL unavailable → static artwork (silent catch).
+- The old sharp-generated halftone poster (`scripts/generate-hero-poster.mjs`, `public/images/hero-poster.png`) is no longer used by the hero; the halftone motif is retained for the OG image (5.5).
 
 ### 5.2 Work chapters (GSAP sticky-stack)
 
@@ -243,11 +248,13 @@ Three case-study cards pin and stack per the canonical skeleton in `taste-skill`
 
 Three small interactive widgets, each an isolated `"use client"` leaf, lazy-mounted when scrolled into view:
 
-1. **Mini image editor** (Pixi): one image, three sliders (exposure, grain, halftone). Proves the day-job skill directly. Filters via Pixi filters, 60fps.
+1. **Ember brush** (Pixi) — *builds in Phase 7, replacing the retired mini editor.* A blank canvas you paint on: strokes emit the same true-color ember particles as the hero, which drift, glow, and dissipate over a few seconds; a mono "clear" action resets. Pure ParticleContainer + ticker (no filter pipeline, which is what sank the mini editor: a Pixi v8 `BindGroup.setResource` null crash on any filtered re-render). Ties the whole page's particle motif into one touchable loop.
+   - *Rejected alternates:* pen-tool bezier playground (echoes the artwork's curve-editor motif but reads as a tutorial, not a toy); kinetic type tester (weakest craft proof of the three).
+   - *Retired:* the Pixi mini image editor (exposure/grain/halftone sliders). Owner disliked it and the v8 filter crash made every slider blank the canvas. Removed Aug 2026.
 2. **Spring playground** (Motion): a draggable ball with editable stiffness/damping sliders and a live spring-curve trace. Proves motion literacy.
 3. **Text scramble clock** (vanilla + WAAPI): live IST clock whose digits scramble-settle on minute change. Proves restraint + typography. (Also the only place a "clock" is allowed; it is a demo, not decor.)
 
-Bento composition: editor demo spans 2 columns (landscape), spring + clock stack in the third column. Each cell has a real visual (the demo itself), a one-line title, and a "view source" link to the GitHub file. No empty cells.
+Bento composition (interim, until the ember brush ships): spring playground spans 2 columns, clock takes the third. Final composition: ember brush spans 2 columns, spring + clock stack in the third. Each cell has a real visual (the demo itself), a one-line title, and a "view source" link to the GitHub file. No empty cells.
 
 ### 5.4 GitHub proof bar (live data)
 
@@ -269,9 +276,9 @@ Reuses the existing contributions API (`jogruber.de/v4/yashsharma31`), rebuilt a
 
 ### 6.1 Hero (`#top`)
 
-- Full `min-h-[100dvh]`, canvas as background layer (`--z-canvas`), content left-anchored on the 12-col grid (cols 1-7), vertically centered, `pt` respecting 64px nav, max `pt-24` beyond it.
+- Full `min-h-[100dvh]`, artwork + canvas as right-anchored background layer (`--z-canvas`, 60% width at `lg`, dimmed to 30% opacity under `md` where it sits behind the text), content left-anchored, vertically centered, `pt` respecting 64px nav.
 - Text stack (4 elements, hero discipline):
-  1. Headline (2 lines locked): `I build editors, canvases,` / `and interfaces that feel fast.` Display scale, Satoshi 800.
+  1. Headline (locked copy, wraps to ~4 lines in the narrower left column): `I build editors, canvases,` / `and interfaces that feel fast.` — with `feel fast.` in the accent color (per the approved hero mockup). Display scale, Satoshi 800.
   2. Subtext (locked, 14 words): `SDE-2 at Trential. Four years shipping secure wallets, evaluation portals, and WebGL canvas editors.`
   3. CTAs: primary "See the work" (accent pill, scrolls to `#projects`), secondary "Get in touch" (text link + arrow, scrolls to `#contact`).
   4. Nothing else. No tagline, no trust strip, no scroll cue, no version label, no locale strip.
@@ -383,7 +390,7 @@ Work on branch `redesign/canvas-2026`. One commit per phase minimum. Never break
 ### Phase 7: Polish, audit, ship
 
 **Prompt:**
-> Load `.cursor/skills/review-animations/SKILL.md` (+ STANDARDS.md), `improve-animations/AUDIT.md`, and `taste-skill` Section 14. First run the full animation review across all new components and fix every flagged item (the review table format is mandatory in the PR description). Then run the entire taste-skill Pre-Flight Check as a literal checklist against the built page and fix failures. Then: Lighthouse (desktop + mobile emulation) targeting LCP < 2.5s, CLS < 0.1, INP < 200ms, Performance ≥ 90 mobile; keyboard-only walk (focus visible everywhere, skip-to-content link added); copy self-audit of every visible string (zero em-dashes: `rg "—|–" src/` must return nothing); cross-viewport Playwright screenshots at 360, 768, 1024, 1440, 1920 read and corrected; `npm run build` bundle check (initial route JS < 250KB gz excluding lazy chunks). Delete all dead files, run `npm run lint`. Final full e2e suite green.
+> Load `.cursor/skills/review-animations/SKILL.md` (+ STANDARDS.md), `improve-animations/AUDIT.md`, and `taste-skill` Section 14. First build the **ember brush** Lab demo per PRD 5.3.1 (`src/components/lab/EmberBrush.tsx`: Pixi ParticleContainer, pointer strokes emit ember particles that drift up and fade over ~3s, mono clear button, no filter pipeline, reduced-motion static variant, lazy mount, e2e: stroke changes canvas + clear resets) and restore the final bento composition (brush spans 2 cols, spring + clock stack in the third). Then run the full animation review across all new components and fix every flagged item (the review table format is mandatory in the PR description). Then run the entire taste-skill Pre-Flight Check as a literal checklist against the built page and fix failures. Then: Lighthouse (desktop + mobile emulation) targeting LCP < 2.5s, CLS < 0.1, INP < 200ms, Performance ≥ 90 mobile; keyboard-only walk (focus visible everywhere, skip-to-content link added); copy self-audit of every visible string (zero em-dashes: `rg "—|–" src/` must return nothing); cross-viewport Playwright screenshots at 360, 768, 1024, 1440, 1920 read and corrected; `npm run build` bundle check (initial route JS < 250KB gz excluding lazy chunks). Delete all dead files, run `npm run lint`. Final full e2e suite green.
 
 **Accept:** every checkbox of taste-skill Section 14 honestly ticked; Lighthouse numbers recorded in PR; zero em-dash grep; suite green.
 
@@ -427,6 +434,9 @@ Work on branch `redesign/canvas-2026`. One commit per phase minimum. Never break
 - **Trential chapters lead, Glue chapter anchors:** recency and seniority first (secure wallets, enterprise portals), then the canvas-craft chapter that the hero and Lab visually echo. Dashgen dropped from chapters (not on the LinkedIn record).
 - **Dark-only:** the canvas hero and duotone treatment are designed for dark; a light theme would double every asset and QA cost for near-zero audience gain.
 - **Full stack upgrade up front (Next 16, Tailwind 4, Motion 13):** owner override of the no-churn rule; upgrading before the rebuild means every new component is written once against current APIs (CSS-first tokens, Motion 13 types) instead of migrated later.
+- **Commissioned hero illustration + scroll-dissolve (Aug 2026):** Yash supplied a brand-matched illustration (dark, ember, editor-UI motifs) and approved a mockup with it. It replaces the halftone photo poster as the hero visual; the Pixi engine now samples the artwork into true-color particles that dissolve upward on scroll and reform at top. More personality than the photo halftone, same proof-of-craft.
+- **Hero art ships as a background-removed PNG (Aug 2026):** Yash supplied a 3072px upscale; `scripts/process-hero-art.mjs` flood-fills the flat backdrop from the borders to transparency (protecting dark interior pixels), feathers the edge, and emits a 2048w PNG. The art now floats on the page bg with no rectangle edge and no CSS mask, and stays crisp at retina.
+- **Mini editor retired, ember brush replaces it (Aug 2026, builds Phase 7):** owner disliked the editor demo, and Pixi v8's filter pipeline crashed (`BindGroup.setResource` on null) on every re-render with any filter attached, blanking the canvas. The replacement uses the particle system only, which is already proven in the hero.
 
 ## 12. Inputs still owed by Yash (`[PENDING-INPUT]` registry)
 

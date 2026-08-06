@@ -1,21 +1,24 @@
+import Reveal from "@/components/motion/Reveal";
 import { EMAIL } from "@/utils/constants";
-import Placeholder from "./Placeholder";
+import ContactForm from "@/components/contact/ContactForm";
 
-/** Contact (PRD 6.8). Copy locked. Inline form lands in Phase 6. */
+/** Contact (PRD 6.8). Giant type + inline EmailJS form. */
 export default function ContactSection() {
   return (
     <section id="contact" aria-label="Contact" className="py-24 md:py-40">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
-        <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.95] tracking-tighter text-ink">
-          Let&apos;s build
-          <br />
-          something together.
-        </h2>
-        <p className="mt-6 max-w-[65ch] text-lg text-ink-secondary">
-          I read everything sent here. Expect a reply within two days.
-        </p>
+        <Reveal>
+          <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-extrabold leading-[0.95] tracking-tighter text-ink">
+            Let&apos;s build
+            <br />
+            something together.
+          </h2>
+          <p className="mt-6 max-w-[65ch] text-lg text-ink-secondary">
+            I read everything sent here. Expect a reply within two days.
+          </p>
+        </Reveal>
         <div className="mt-12 max-w-xl">
-          <Placeholder phase={6} note="Inline contact form (EmailJS)" />
+          <ContactForm />
         </div>
         <p className="mt-8 text-ink-secondary">
           Or email directly:{" "}
