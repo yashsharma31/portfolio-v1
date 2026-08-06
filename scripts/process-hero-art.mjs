@@ -1,10 +1,3 @@
-/**
- * Produces public/images/hero-art.png from assets-src/hero-art-source.png:
- * removes the flat dark backdrop via border-seeded flood fill (protects dark
- * interior pixels like the shirt), feathers the alpha edge, resizes to 2048w.
- *
- * Run: node scripts/process-hero-art.mjs
- */
 import sharp from "sharp";
 
 const SRC = "assets-src/hero-art-source.png";
@@ -41,7 +34,9 @@ for (const [cx, cy] of [
 sr /= n;
 sg /= n;
 sb /= n;
-console.log(`bg seed: rgb(${sr.toFixed(0)}, ${sg.toFixed(0)}, ${sb.toFixed(0)})`);
+console.log(
+  `bg seed: rgb(${sr.toFixed(0)}, ${sg.toFixed(0)}, ${sb.toFixed(0)})`,
+);
 
 const tol2 = TOLERANCE * TOLERANCE;
 const isBg = (i) => {
@@ -79,14 +74,18 @@ while (head < tail) {
   if (y > 0) push(x, y - 1);
   if (y < H - 1) push(x, y + 1);
 }
-console.log(`removed ${tail} of ${W * H} pixels (${((tail / (W * H)) * 100).toFixed(1)}%)`);
+console.log(
+  `removed ${tail} of ${W * H} pixels (${((tail / (W * H)) * 100).toFixed(1)}%)`,
+);
 
 for (let p = 0; p < W * H; p++) {
   if (visited[p]) data[p * 4 + 3] = 0;
 }
 
 // Feather: blur only the alpha channel by rebuilding through sharp.
-const alphaBlurred = await sharp(data, { raw: { width: W, height: H, channels: 4 } })
+const alphaBlurred = await sharp(data, {
+  raw: { width: W, height: H, channels: 4 },
+})
   .extractChannel(3)
   .blur(1.2)
   .raw()
