@@ -19,7 +19,7 @@ export default function ContactPage() {
           Back to Portfolio
         </Link>
 
-        <div className="gap-12 grid md:grid-cols-[1fr,400px]">
+        <div className="gap-12 grid md:grid-cols-[1fr_400px]">
           <ContactForm />
 
           <aside className="space-y-8">

@@ -145,10 +145,10 @@ const RecentProjects = () => {
         {projects.map((project) => (
           <motion.div
             key={project.title}
-            className={`p-5 md:p-8 rounded-3xl bg-gradient-to-br ${project.gradient} backdrop-blur-3xl border border-white/10 md:hover:border-white/20 transition-all group relative overflow-hidden md:[&:hover]:scale-105`}
+            className={`p-5 md:p-8 rounded-3xl bg-linear-to-br ${project.gradient} backdrop-blur-3xl border border-white/10 md:hover:border-white/20 transition-all group relative overflow-hidden md:[&:hover]:scale-105`}
             variants={cardVariants}
           >
-            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-size-[20px_20px]" />
             <div className="relative space-y-4 md:space-y-6">
               <div className="flex justify-between items-start gap-4">
                 <div>

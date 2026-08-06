@@ -145,17 +145,17 @@ export default function GitHubContributions() {
   if (loading) {
     return (
       <motion.div
-        className="bg-zinc-900/50 backdrop-blur-sm p-6 rounded-xl"
+        className="bg-zinc-900/50 backdrop-blur-xs p-6 rounded-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="space-y-4 animate-pulse">
-          <div className="bg-zinc-800/50 rounded w-1/4 h-6"></div>
+          <div className="bg-zinc-800/50 rounded-sm w-1/4 h-6"></div>
           <div className="gap-4 grid grid-cols-2 mb-4">
             <div className="bg-zinc-800/50 rounded-xl h-20"></div>
             <div className="bg-zinc-800/50 rounded-xl h-20"></div>
           </div>
-          <div className="bg-zinc-800/50 rounded h-[200px]"></div>
+          <div className="bg-zinc-800/50 rounded-sm h-[200px]"></div>
         </div>
       </motion.div>
     );
@@ -164,7 +164,7 @@ export default function GitHubContributions() {
   if (error) {
     return (
       <motion.div
-        className="bg-zinc-900/50 backdrop-blur-sm p-6 rounded-xl"
+        className="bg-zinc-900/50 backdrop-blur-xs p-6 rounded-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -191,7 +191,7 @@ export default function GitHubContributions() {
 
   return (
     <motion.div
-      className="space-y-6 border-white/5 hover:border-white/10 bg-zinc-900/50 backdrop-blur-sm mx-auto p-6 border rounded-xl max-w-3xl transition-colors"
+      className="space-y-6 border-white/5 hover:border-white/10 bg-zinc-900/50 backdrop-blur-xs mx-auto p-6 border rounded-xl max-w-3xl transition-colors"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -237,7 +237,7 @@ export default function GitHubContributions() {
             <motion.div
               key={day.date}
               variants={item}
-              className={`aspect-square w-full rounded-sm ${getLevelColor(
+              className={`aspect-square w-full rounded-xs ${getLevelColor(
                 day.level
               )} transition-all duration-300 hover:ring-2 hover:ring-white/20 hover:scale-125 cursor-pointer`}
               title={`${day.count} contributions on ${new Date(
@@ -259,7 +259,7 @@ export default function GitHubContributions() {
           <motion.div
             key={level}
             whileHover={{ scale: 1.2 }}
-            className={`w-2.5 h-2.5 rounded-sm ${getLevelColor(
+            className={`w-2.5 h-2.5 rounded-xs ${getLevelColor(
               level
             )} cursor-pointer`}
           />

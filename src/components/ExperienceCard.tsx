@@ -28,13 +28,13 @@ const ExperienceCard = ({
 
   return (
     <motion.div
-      className="relative flex flex-col gap-4 md:gap-6 border-white/10 md:hover:border-white/20 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm p-5 md:p-8 border rounded-3xl transition-all overflow-hidden group hover:md:scale-105"
+      className="relative flex flex-col gap-4 md:gap-6 border-white/10 md:hover:border-white/20 bg-linear-to-br from-white/5 to-white/10 backdrop-blur-xs p-5 md:p-8 border rounded-3xl transition-all overflow-hidden group md:hover:scale-105"
       variants={{
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
       }}
     >
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-size-[20px_20px]" />
       <div className="relative space-y-3 md:space-y-4">
         <div className="space-y-2 md:space-y-3">
           <div className="flex items-center gap-2 md:gap-3">
@@ -78,7 +78,7 @@ const ExperienceCard = ({
             }}
             transition={{ delay: index * 0.1 }}
           >
-            <FiChevronRight className="md:group-hover:text-white/60 flex-shrink-0 mt-1 w-4 md:w-5 h-4 md:h-5 text-gray-500 transition-colors" />
+            <FiChevronRight className="md:group-hover:text-white/60 shrink-0 mt-1 w-4 md:w-5 h-4 md:h-5 text-gray-500 transition-colors" />
             <span>{responsibility}</span>
           </motion.li>
         ))}

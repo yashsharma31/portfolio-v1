@@ -34,11 +34,11 @@ export default function Home() {
       itemType="http://schema.org/Person"
     >
       <ParticleBackground />
-      <div className="relative mx-auto px-4 py-8 md:pt-0 max-w-screen-xl">
+      <div className="relative mx-auto px-4 py-8 md:pt-0 max-w-(--breakpoint-xl)">
         <div className={`flex  ${isMobile ? "flex-col" : "gap-24"}`}>
           <aside
             id="profile"
-            className="md:flex-shrink-0 md:w-[400px]"
+            className="md:shrink-0 md:w-[400px]"
             itemProp="author"
             itemScope
             itemType="http://schema.org/Person"
@@ -165,7 +165,7 @@ export default function Home() {
               <div className="space-y-6 max-w-4xl">
                 <a
                   href="/contact"
-                  className="inline-block bg-gradient-to-r from-indigo-500 hover:from-indigo-600 to-purple-500 hover:to-purple-600 shadow-indigo-500/20 shadow-lg px-8 py-4 rounded-xl w-full font-semibold text-center text-lg text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  className="inline-block bg-linear-to-r from-indigo-500 hover:from-indigo-600 to-purple-500 hover:to-purple-600 shadow-indigo-500/20 shadow-lg px-8 py-4 rounded-xl w-full font-semibold text-center text-lg text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Get in Touch
                 </a>

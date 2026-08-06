@@ -81,7 +81,7 @@ export default function DesignThoughts() {
             Array.from({ length: 4 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="relative flex flex-col gap-3 md:gap-4 border-white/5 bg-black/20 backdrop-blur-sm p-4 md:p-6 border rounded-3xl overflow-hidden"
+                className="relative flex flex-col gap-3 md:gap-4 border-white/5 bg-black/20 backdrop-blur-xs p-4 md:p-6 border rounded-3xl overflow-hidden"
                 variants={{
                   initial: { opacity: 0, y: 20 },
                   animate: { opacity: 1, y: 0 },
@@ -101,7 +101,7 @@ export default function DesignThoughts() {
                 target="_blank"
                 rel="noopener noreferrer"
                 key={post.title}
-                className="relative flex flex-col gap-3 md:gap-4 border-white/5 bg-black/20 md:hover:bg-white/5 backdrop-blur-sm p-4 md:p-6 border rounded-3xl transition-all overflow-hidden active:scale-[0.99] group"
+                className="relative flex flex-col gap-3 md:gap-4 border-white/5 bg-black/20 md:hover:bg-white/5 backdrop-blur-xs p-4 md:p-6 border rounded-3xl transition-all overflow-hidden active:scale-[0.99] group"
                 variants={{
                   initial: { opacity: 0, y: 20 },
                   animate: { opacity: 1, y: 0 },
@@ -113,6 +113,7 @@ export default function DesignThoughts() {
                       src={post.thumbnail}
                       alt={post.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="md:group-hover:scale-105 transition-transform duration-300 object-cover"
                     />
                   </div>

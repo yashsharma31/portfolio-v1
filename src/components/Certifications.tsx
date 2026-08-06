@@ -134,7 +134,7 @@ export default function Certifications() {
         {certifications.map((cert) => (
           <motion.div
             key={cert.title}
-            className="relative flex flex-col gap-3 border-white/5 md:hover:border-white/20 bg-black/20 backdrop-blur-sm p-3 md:p-4 border rounded-2xl transition-colors overflow-hidden active:scale-[0.99] group"
+            className="relative flex flex-col gap-3 border-white/5 md:hover:border-white/20 bg-black/20 backdrop-blur-xs p-3 md:p-4 border rounded-2xl transition-colors overflow-hidden active:scale-[0.99] group"
             variants={{
               initial: { opacity: 0, y: 20 },
               animate: { opacity: 1, y: 0 },

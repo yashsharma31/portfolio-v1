@@ -4,7 +4,7 @@ import { FiUser, FiMail, FiMessageSquare, FiBriefcase } from "react-icons/fi";
 import { FaLinkedinIn, FaGithub } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import emailjs from "emailjs-com";
+import emailjs from "@emailjs/browser";
 import { FaXTwitter } from "react-icons/fa6";
 
 interface EmailJSError extends Error {
@@ -146,7 +146,7 @@ export default function ContactForm() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/20"
+                className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-hidden focus:ring-1 focus:ring-indigo-500/20"
                 placeholder="John Doe"
               />
               <FiUser className="group-focus-within:text-indigo-400 top-1/2 left-4 absolute w-4 h-4 text-zinc-500 transition-colors -translate-y-1/2 duration-300" />
@@ -163,7 +163,7 @@ export default function ContactForm() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/20"
+                className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-hidden focus:ring-1 focus:ring-indigo-500/20"
                 placeholder="john@example.com"
               />
               <FiMail className="group-focus-within:text-indigo-400 top-1/2 left-4 absolute w-4 h-4 text-zinc-500 transition-colors -translate-y-1/2 duration-300" />
@@ -182,7 +182,7 @@ export default function ContactForm() {
               value={formData.subject}
               onChange={handleChange}
               required
-              className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/20"
+              className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-hidden focus:ring-1 focus:ring-indigo-500/20"
               placeholder="Tell me about your project"
             />
             <FiBriefcase className="group-focus-within:text-indigo-400 top-1/2 left-4 absolute w-4 h-4 text-zinc-500 transition-colors -translate-y-1/2 duration-300" />
@@ -200,7 +200,7 @@ export default function ContactForm() {
               onChange={handleChange}
               required
               rows={6}
-              className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-indigo-500/20 resize-none"
+              className="border-zinc-700/50 focus:border-indigo-500/50 bg-zinc-800/50 focus:bg-zinc-800/70 px-4 py-3 pl-12 rounded-xl w-full text-zinc-100 placeholder:text-zinc-500 transition-all duration-300 focus:outline-hidden focus:ring-1 focus:ring-indigo-500/20 resize-none"
               placeholder="Share the details of your project, timeline, and any specific requirements..."
             />
             <FiMessageSquare className="group-focus-within:text-indigo-400 top-4 left-4 absolute w-4 h-4 text-zinc-500 transition-colors duration-300" />
@@ -210,7 +210,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={isLoading || !isInitialized}
-          className={`w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+          className={`w-full bg-linear-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
             isLoading || !isInitialized ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >

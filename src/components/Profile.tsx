@@ -15,11 +15,11 @@ const imageAnimation = {
       borderRadius: {
         duration: 3,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
       scale: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   },
@@ -30,7 +30,7 @@ const socialIconVariants = {
   animate: (i: number) => ({
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 20,
       delay: i * 0.1 + 1,
@@ -40,7 +40,7 @@ const socialIconVariants = {
     scale: 1.2,
     rotate: 360,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 400,
       damping: 10,
     },
@@ -54,7 +54,7 @@ const shimmerEffect = {
     transition: {
       duration: 4,
       repeat: Infinity,
-      ease: "linear",
+      ease: "linear" as const,
     },
   },
 };
@@ -80,11 +80,10 @@ function MobileProfile() {
           <Image
             src="/images/profile.jpeg"
             alt="Yash Sharma"
-            className="relative rounded-2xl"
+            className="relative rounded-2xl object-cover"
             fill
             sizes="(max-width: 768px) 280px, 280px"
             priority
-            objectFit="cover"
           />
         </motion.div>
 
@@ -185,7 +184,7 @@ export default function Profile() {
       <MobileProfile />
       <motion.div
         ref={profileRef}
-        className="md:block top-32 fixed hidden bg-gradient-to-br from-gray-900 to-black rounded-3xl w-[400px] h-[680px] overflow-hidden"
+        className="md:block top-32 fixed hidden bg-linear-to-br from-gray-900 to-black rounded-3xl w-[400px] h-[680px] overflow-hidden"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -201,7 +200,7 @@ export default function Profile() {
         />
 
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+          className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"
           variants={shimmerEffect}
           initial="hidden"
           animate="visible"
@@ -218,13 +217,14 @@ export default function Profile() {
             animate="animate"
             whileHover={{ scale: 1.05 }}
           >
-            <motion.div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl" />
+            <motion.div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-purple-500/20 rounded-2xl" />
             <Image
               src="/images/profile.jpeg"
               alt="Yash Sharma"
-              className="relative rounded-2xl"
+              className="relative rounded-2xl object-cover"
               fill
-              objectFit="cover"
+              sizes="300px"
+              priority
             />
           </motion.div>
 
@@ -269,7 +269,7 @@ export default function Profile() {
               >
                 <Link
                   href={social.href}
-                  className="flex justify-center items-center bg-gradient-to-r from-blue-500/20 hover:from-blue-500/30 to-purple-500/20 hover:to-purple-500/30 rounded-full w-11 h-11 text-white transition-all"
+                  className="flex justify-center items-center bg-linear-to-r from-blue-500/20 hover:from-blue-500/30 to-purple-500/20 hover:to-purple-500/30 rounded-full w-11 h-11 text-white transition-all"
                 >
                   {social.icon}
                 </Link>

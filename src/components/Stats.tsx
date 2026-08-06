@@ -18,7 +18,7 @@ const variants = {
     animate: (delay: number) => ({
       y: 0,
       opacity: 1,
-      transition: { delay, duration: 0.5, ease: "easeOut" },
+      transition: { delay, duration: 0.5, ease: "easeOut" as const },
     }),
   },
   staggerContainer: {
@@ -32,7 +32,7 @@ const variants = {
     rest: { scale: 1 },
     hover: {
       scale: 1.05,
-      transition: { duration: 0.3, ease: "easeInOut" },
+      transition: { duration: 0.3, ease: "easeInOut" as const },
     },
   },
   arrowHover: {
@@ -41,7 +41,7 @@ const variants = {
       x: 10,
       transition: {
         duration: 0.3,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
   },
@@ -133,7 +133,7 @@ const Stats = () => {
         {projects.map((project, i) => (
           <motion.div
             key={project.title}
-            className="relative rounded-3xl cursor-pointer aspect-[4/3]"
+            className="relative rounded-3xl cursor-pointer aspect-4/3"
             variants={variants.projectHover}
             initial="rest"
             whileHover="hover"
@@ -142,9 +142,10 @@ const Stats = () => {
             <Image
               src={project.src}
               alt={project.title}
-              className="border-2 opacity-80 border-black rounded-2xl"
+              className="border-2 opacity-80 border-black rounded-2xl object-cover"
               fill
-              objectFit="cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
             />
             <motion.div
               className="top-8 left-8 absolute"

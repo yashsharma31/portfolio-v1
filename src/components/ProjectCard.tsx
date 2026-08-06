@@ -17,7 +17,7 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   return (
     <motion.div
-      className="relative flex items-center gap-8 border-white/5 bg-black/20 backdrop-blur-sm p-6 border rounded-3xl cursor-pointer overflow-hidden group"
+      className="relative flex items-center gap-8 border-white/5 bg-black/20 backdrop-blur-xs p-6 border rounded-3xl cursor-pointer overflow-hidden group"
       variants={{
         initial: { opacity: 0, y: 20 },
         animate: { opacity: 1, y: 0 },
@@ -29,7 +29,7 @@ const ProjectCard = ({
     >
       {/* Background Gradient */}
       <div
-        className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 
+        className={`absolute inset-0 bg-linear-to-r ${gradient} opacity-0 
         group-hover:opacity-100 transition-opacity duration-500`}
       />
 

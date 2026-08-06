@@ -123,7 +123,7 @@ export default function PremiumTools() {
               {category.items.map((item) => (
                 <motion.div
                   key={item.name}
-                  className="relative flex items-center gap-3 md:gap-4 border-white/10 bg-white/5 md:hover:bg-white/10 backdrop-blur-sm p-3 md:p-4 border rounded-2xl transition-colors cursor-default md:cursor-pointer group"
+                  className="relative flex items-center gap-3 md:gap-4 border-white/10 bg-white/5 md:hover:bg-white/10 backdrop-blur-xs p-3 md:p-4 border rounded-2xl transition-colors cursor-default md:cursor-pointer group"
                   variants={{
                     initial: { opacity: 0, y: 20 },
                     animate: { opacity: 1, y: 0 },

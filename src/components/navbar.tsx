@@ -70,17 +70,17 @@ const containerVariants = {
   expanded: {
     width: "36rem",
     height: "4rem",
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3, ease: "easeOut" as const },
   },
   expandedNoText: {
     width: "24rem",
     height: "4rem",
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3, ease: "easeOut" as const },
   },
   collapsed: {
     width: "24rem",
     height: "3rem",
-    transition: { duration: 0.3, delay: 0.2, ease: "easeInOut" },
+    transition: { duration: 0.3, delay: 0.2, ease: "easeInOut" as const },
   },
 };
 
@@ -90,7 +90,7 @@ const contentVariants = {
     y: 0,
     transition: {
       delay: 0.3 + i * 0.1,
-      type: "spring",
+      type: "spring" as const,
       stiffness: 200,
       damping: 20,
     },
@@ -158,7 +158,7 @@ function MobileNav() {
   return (
     <>
       <motion.div
-        className="right-0 bottom-0 left-0 z-50 fixed border-gray-800 md:hidden bg-black/90 backdrop-blur-sm border-t"
+        className="right-0 bottom-0 left-0 z-50 fixed border-gray-800 md:hidden bg-black/90 backdrop-blur-xs border-t"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 100 }}
@@ -220,7 +220,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    return scrollY.onChange((latest) => {
+    return scrollY.on("change", (latest) => {
       setShowScrollTop(latest > 200);
     });
   }, [scrollY]);
@@ -267,7 +267,7 @@ export default function Navbar() {
 
   return (
     <div className="">
-      <div className="mx-auto w-full max-w-screen-xl md:h-20" />
+      <div className="mx-auto w-full max-w-(--breakpoint-xl) md:h-20" />
       <AnimatePresence>
         {isLoaded && (
           <>
@@ -293,7 +293,7 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <div className="mx-auto px-4 py-6 max-w-screen-xl">
+              <div className="mx-auto px-4 py-6 max-w-(--breakpoint-xl)">
                 <motion.div
                   className="relative flex items-center border-2 border-gray-800 bg-black mx-auto rounded-full"
                   variants={containerVariants}
@@ -323,7 +323,7 @@ export default function Navbar() {
                           <div className="group-hover:scale-110 transform transition-transform duration-200">
                             {icon}
                           </div>
-                          <div className="top-0 left-1/2 absolute border-gray-700 bg-gray-900/95 opacity-0 group-hover:opacity-100 shadow-lg backdrop-blur-sm mb-2 px-2 py-1 border rounded text-white text-xs whitespace-nowrap transition-all -translate-x-1/2 -translate-y-full duration-200 pointer-events-none">
+                          <div className="top-0 left-1/2 absolute border-gray-700 bg-gray-900/95 opacity-0 group-hover:opacity-100 shadow-lg backdrop-blur-xs mb-2 px-2 py-1 border rounded-sm text-white text-xs whitespace-nowrap transition-all -translate-x-1/2 -translate-y-full duration-200 pointer-events-none">
                             {text}
                           </div>
                         </motion.button>
