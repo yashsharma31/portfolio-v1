@@ -9,7 +9,7 @@ export default function ExperienceSection() {
           Where the hours went.
         </h2>
         <div className="mt-12">
-          <Placeholder phase={4} note="Timeline rail (Glue Labs roles)" />
+          <Placeholder phase={4} note="Timeline rail (4 roles: Trential + Glue Labs, src/data/experience.ts)" />
         </div>
       </div>
     </section>

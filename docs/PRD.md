@@ -28,7 +28,13 @@
 
 Reading this as: **a design-engineer portfolio for hiring managers, founders, and design-conscious engineers, with a dark, craft-forward, canvas-native language, leaning toward native Tailwind + Motion + GSAP + Pixi.js.**
 
-The core insight: Yash's professional edge is **canvas/WebGL editor engineering** (Pixi.js photo editor, video creator, rich text editor at Glue Labs). Every dev portfolio *claims* skills; this one must **prove them in the page itself**. The portfolio is the demo.
+The core insight: Yash's professional edge is twofold. His craft signature is **canvas/WebGL editor engineering** (Pixi.js photo and video editors, Slate.js rich text at Glue Labs, 2022-2025); his current seniority proof is **secure, telemetry-driven product engineering at Trential** (SDE-2: TruWallet with NFC passport scanning and biometrics, the TruEnroll evaluation portal, Web Wallet v4). Every dev portfolio *claims* skills; this one must **prove them in the page itself**. The canvas hero and Lab demonstrate the craft; the work chapters demonstrate the production seniority.
+
+**Timeline of record (from LinkedIn profile + monthly reports, Aug 2026):**
+- Trential, Gurugram: SDE-2 (Mar 2026-present), SDE (Mar 2025-Feb 2026)
+- Glue Labs: SDE (Jun 2023-Mar 2025), SDE Intern (Mar 2022-May 2023)
+- Bennett University, BTech CS (2019-2023)
+- 4+ years total, shipping since March 2022
 
 ### 1.2 Dials (locked)
 
@@ -38,7 +44,7 @@ The core insight: Yash's professional edge is **canvas/WebGL editor engineering*
 
 ### 1.3 Goals
 
-1. A visitor understands within 5 seconds: *this person builds canvas tools and high-craft interfaces.*
+1. A visitor understands within 5 seconds: *this person builds high-craft interfaces, from WebGL canvas tools to secure production wallets.*
 2. Every claim is backed by something interactive, visual, or verifiable (live GitHub data, real product screenshots, working demos).
 3. The page feels engineered: 60fps motion, instant response, no jank, works beautifully on mobile.
 4. A recruiter can reach "contact" in one scroll gesture or one click at any time.
@@ -69,8 +75,8 @@ The core insight: Yash's professional edge is **canvas/WebGL editor engineering*
 | Profile card (sticky left) | Photo, name, one-liner, socials | **Rework** into hero + about. Kill the fixed 400px card layout entirely. |
 | Stats ("~3 years, +18 projects, +28 worked libraries") | Weak, fuzzy numbers | **Replace** with verifiable stats (Section 2.3) |
 | GitHub contributions graph | Live via `github-contributions-api.jogruber.de`, user `yashsharma31` | **Keep + redesign.** Live data is a strength. |
-| Recent Projects (Glue, Dashgen, xG) | Real work, text-only gradient cards | **Promote** to full case-study chapters with real screenshots |
-| Experience (Glue Labs SDE + intern) | Real, metric-backed bullets | **Keep + tighten** (max 3 bullets each, strongest metrics only) |
+| Recent Projects (Glue, Dashgen, xG) | 1.5 years stale, text-only gradient cards | **Replace** with the new chapter set: TruWallet, TruEnroll, Glue canvas suite (canonical data: `src/data/projects.ts`) |
+| Experience (was Glue Labs SDE + intern only) | 1.5 years stale | **Replace** with the 4-role timeline: Trential SDE-2, Trential SDE, Glue Labs SDE, Glue Labs intern (max 3 bullets each, strongest verified facts only). Canonical data: `src/data/experience.ts`. |
 | Tech stack (16 icon tiles in 5 categories) | Icon-grid wall | **Demote** to one compact line inside About. Icon walls are filler. |
 | Resume download | `Yash-Sharma-Resume.pdf` | **Keep** (nav + about) |
 | Blog (Medium RSS, live) | Working API route with `rss-parser` | **Keep + redesign** as editorial list rows |
@@ -81,16 +87,16 @@ The core insight: Yash's professional edge is **canvas/WebGL editor engineering*
 
 ### 2.2 New content to add
 
-1. **Case studies** (3): Glue canvas editor, Dashgen, xG video/email tooling. Structure per Section 6.3. `[PENDING-INPUT: git commit history will refine the "what I actually built" bullets; real product screenshots or permission to capture live sites]`
+1. **Case studies** (3): TruWallet + Web Wallet v4 (Trential), TruEnroll evaluation platform (Trential), Glue canvas suite (Glue Labs; xG folds in here). Structure per Section 6.3. Bullets are sourced from the LinkedIn profile and 2026 monthly reports (already provided). `[PENDING-INPUT: Trential product visuals and permission (marketing site assets or app-store screenshots; portals are auth-walled); Dashgen is out of the chapters, optionally mentioned in About]`
 2. **The Lab** (3 interactive demos): small, self-contained proof-of-craft widgets (Section 6.4). These are new builds.
-3. **"Now" line:** current role + availability status, one sentence in hero and contact.
+3. **"Now" line:** SDE-2 at Trential + availability status, one sentence in hero and contact.
 4. **Open-source / GitHub facts:** pulled live: total contributions (current year), current streak, public repos.
 5. **About:** 2 short paragraphs of real voice (first person, plain language) + photo + compact stack line + resume link. `[PENDING-INPUT: 3-4 personal facts worth telling: what he's learning, what he wants to build next]`
 6. **Optional, only if real:** 1-2 testimonial quotes from colleagues. `[PENDING-INPUT]` Skip the section entirely if not provided; never fabricate.
 
 ### 2.3 Stats policy (hard rule)
 
-Only verifiable numbers ship. Approved sources: GitHub API (live), resume facts (3+ years at Glue Labs), product facts confirmed by Yash. The strings "~3 years / +18 projects / +28 worked libraries" are banned. If a metric can't be verified, the layout drops it gracefully.
+Only verifiable numbers ship. Approved sources: GitHub API (live), the LinkedIn profile PDF, the 2026 monthly reports, and facts confirmed by Yash. Verified numeric pool: 4+ years experience (since 03/2022), 30% video-editor efficiency gain (Glue), 50% campaign setup reduction (xG), 40% email editor UX gain, 15% editing efficiency (Slate.js RTE), 100+ ops cases audited (May 2026). Trential chapters may ship with zero numeric metrics; feature facts (NFC, biometrics, liveness) carry them. The strings "~3 years / +18 projects / +28 worked libraries" are banned. If a metric can't be verified, the layout drops it gracefully.
 
 ### 2.4 Copy voice
 
@@ -266,7 +272,7 @@ Reuses the existing contributions API (`jogruber.de/v4/yashsharma31`), rebuilt a
 - Full `min-h-[100dvh]`, canvas as background layer (`--z-canvas`), content left-anchored on the 12-col grid (cols 1-7), vertically centered, `pt` respecting 64px nav, max `pt-24` beyond it.
 - Text stack (4 elements, hero discipline):
   1. Headline (2 lines locked): `I build editors, canvases,` / `and interfaces that feel fast.` Display scale, Satoshi 800.
-  2. Subtext (locked, 18 words): `Design engineer at Glue Labs. Three years shipping WebGL photo tools, video editors, and rich text systems.`
+  2. Subtext (locked, 14 words): `SDE-2 at Trential. Four years shipping secure wallets, evaluation portals, and WebGL canvas editors.`
   3. CTAs: primary "See the work" (accent pill, scrolls to `#projects`), secondary "Get in touch" (text link + arrow, scrolls to `#contact`).
   4. Nothing else. No tagline, no trust strip, no scroll cue, no version label, no locale strip.
 - Entrance: headline lines mask-reveal upward (80ms stagger), subtext + CTAs fade up after 200ms. One-time, `--ease-out`.
@@ -277,14 +283,17 @@ Directly under hero fold: full-width hairline-top strip, mono type. Left: contri
 
 ### 6.3 Selected Work (`#projects`)
 
-Eyebrow (1 of 2): `SELECTED WORK 2022-2026`. Header: `Three products, one canvas obsession.` (sentence case, text-5xl).
+Eyebrow (1 of 2): `SELECTED WORK 2022-2026`. Header: `Three products, shipped and in production.` (sentence case, text-5xl).
 
 Each chapter card (`bg-elevated`, radius 16, internal 12-col grid):
 
-- Left (cols 1-5): project name (text-4xl), role + period (mono, tertiary), 2-sentence description in plain voice, up to 2 real metrics as mono stat pairs (only resume-verified numbers: e.g. Glue "30% faster rendering", "150ms load-time cut"), stack pills (max 5, pill radius, `bg-subtle`), link "Visit glue.is" with arrow (external).
-- Right (cols 6-12): real product screenshot in a browser-chrome frame (real `<img>`, AVIF/WebP, `next/image`), subtle parallax drift (max 20px) inside the pinned scene.
-- Chapters: **Glue** (canvas photo/video editor, Pixi.js + React), **Dashgen** (multi-model AI workspace), **xG** (video creator + email tooling). `[PENDING-INPUT: refined bullets from git history]`
-- Screenshot acquisition (Phase 2 task): capture live `glue.is` and `dashgen.in` at 1600x1000 via the Playwright script `scripts/capture-work.ts`; xG uses provided assets `[PENDING-INPUT]`; interim placeholder is a labeled `picsum` seed, flagged loudly in the PR notes.
+- Left (cols 1-5): project name (text-4xl), role + period (mono, tertiary), 2-sentence description in plain voice, up to 2 real metrics as mono stat pairs (verified pool in Section 2.3; zero metrics is allowed), stack pills (max 5, pill radius, `bg-subtle`), external link where a public URL exists.
+- Right (cols 6-12): real product visual in a device/browser frame (real `<img>`, AVIF/WebP, `next/image`), subtle parallax drift (max 20px) inside the pinned scene.
+- Chapters (locked order, canonical data in `src/data/projects.ts`):
+  1. **TruWallet + Web Wallet v4** (Trential, 2025-present): secure credential wallet across React Native and web. NFC passport scanning, FaceID/TouchID with liveness checks, DigiLocker and Stripe integrations, GrowthBook A/B testing, full Mixpanel/Sentry telemetry behind a proxy layer. Phone-frame visual.
+  2. **TruEnroll** (Trential, 2025-present): credential evaluation platform for universities. Dynamic grading scales, real-time GPA calculators, OCR document review, platform-wide accessibility overhaul, end-to-end analytics. Browser-frame visual.
+  3. **Glue canvas suite** (Glue Labs, 2022-2025): WebGL photo and video editors on Pixi.js + React, Slate.js rich text editor, email tooling (xG). Metrics: 30% rendering efficiency gain, 50% faster campaign setup. Browser-frame visual.
+- Visual acquisition (Phase 2 task): `glue.is` captured live at 1600x1000 via `scripts/capture-work.ts`. Trential visuals `[PENDING-INPUT: marketing-site assets or app-store screenshots + permission; portals are auth-walled, never screenshot real candidate data]`. Interim placeholder is a labeled `picsum` seed, flagged loudly in the PR notes.
 
 ### 6.4 The Lab (`#lab`)
 
@@ -294,7 +303,7 @@ Bento per 5.3. Each demo card: demo canvas/widget fills the cell, title + one-li
 ### 6.5 Experience (`#experience`)
 
 Header: `Where the hours went.` No eyebrow.
-Vertical accent rail on the left (2px, `--line`, accent segment marks active item on scroll). Two entries (Glue Labs SDE 06/2023-present; Intern 03/2022-05/2023), each: role + company (text-2xl), period (mono tertiary), exactly 3 strongest bullets (metric-first, from current copy, tightened), stack line in mono. Reveal: rows fade up staggered. `[PENDING-INPUT: any freelance/other roles from git history]`
+Vertical accent rail on the left (2px, `--line`, accent segment marks active item on scroll). Four entries from `src/data/experience.ts` (Trential SDE-2 03/2026-present; Trential SDE 03/2025-02/2026; Glue Labs SDE 06/2023-03/2025; Glue Labs Intern 03/2022-05/2023), each: role + company (text-2xl), period (mono tertiary), exactly 3 strongest bullets (fact-first, sourced from LinkedIn + monthly reports), stack line in mono. Reveal: rows fade up staggered.
 
 ### 6.6 Writing (`#blog`)
 
@@ -304,7 +313,7 @@ Editorial rows, not cards: each post = hairline-top row (`border-t border-line`,
 ### 6.7 About (`#about`)
 
 Header: `About` (bare, small; this section's design is the photo).
-Split at `lg`: left cols 1-5 = portrait photo (real, radius 16, duotone-treated to palette: near-black + subtle ember highlight, prepared as an actual processed asset via `scripts/`); right cols 6-12 = two short paragraphs `[PENDING-INPUT: personal facts]` + a single mono stack line: `TypeScript · React · Next.js · Pixi.js · WebGL · Motion · GSAP · Tailwind · Zustand · Node` + resume link `Download resume (PDF)` + socials (GitHub, LinkedIn, X as Phosphor icons). Below `lg`: photo above prose, single column.
+Split at `lg`: left cols 1-5 = portrait photo (real, radius 16, duotone-treated to palette: near-black + subtle ember highlight, prepared as an actual processed asset via `scripts/`); right cols 6-12 = two short paragraphs `[PENDING-INPUT: personal facts; may mention Bennett University BTech CS 2019-2023 and "exploring AI since 2022"]` + a single mono stack line: `TypeScript · React · React Native · Next.js · Pixi.js · WebGL · Motion · Redux · Tailwind · Python` + resume link `Download resume (PDF)` + socials (GitHub, LinkedIn, X as Phosphor icons). Below `lg`: photo above prose, single column.
 
 ### 6.8 Contact (`#contact`)
 
@@ -339,7 +348,7 @@ Work on branch `redesign/canvas-2026`. One commit per phase minimum. Never break
 ### Phase 2: Selected Work
 
 **Prompt:**
-> Load `taste-skill` (Section 5.A skeleton is mandatory), `emil-design-eng`. Create `src/data/projects.ts` typed content module with the three case studies (copy per PRD 6.3, metrics only from resume facts). Write `scripts/capture-work.ts` (Playwright chromium: screenshot glue.is and dashgen.in at 1600x1000, save to `public/images/work/`, run it). Build `src/components/work/WorkChapters.tsx` with the GSAP sticky-stack exactly per the canonical skeleton (`start: "top top"`, pin, pinSpacing false, scale/dim driven by next card), plain stacked fallback under `lg` and under reduced motion, chapter interior per PRD 6.3. Extend e2e: section renders 3 chapters, images load (no 404s), pinning does not trap scroll on mobile viewport. Playwright screenshot loop.
+> Load `taste-skill` (Section 5.A skeleton is mandatory), `emil-design-eng`. Use the existing `src/data/projects.ts` content module (three case studies per PRD 6.3; do not rewrite copy). Write `scripts/capture-work.ts` (Playwright chromium: screenshot glue.is at 1600x1000, save to `public/images/work/`, run it); TruWallet/TruEnroll visuals use provided assets or clearly labeled placeholders until PENDING-INPUT 1 resolves. Build `src/components/work/WorkChapters.tsx` with the GSAP sticky-stack exactly per the canonical skeleton (`start: "top top"`, pin, pinSpacing false, scale/dim driven by next card), plain stacked fallback under `lg` and under reduced motion, chapter interior per PRD 6.3. Extend e2e: section renders 3 chapters, images load (no 404s), pinning does not trap scroll on mobile viewport. Playwright screenshot loop.
 
 **Accept:** desktop scroll-through feels continuous (verify by scrubbing screenshots at 3 scroll positions); mobile = simple stack; no layout shift from image loads (explicit aspect ratios); e2e green.
 
@@ -391,7 +400,7 @@ Work on branch `redesign/canvas-2026`. One commit per phase minimum. Never break
 
 ## 9. SEO and migration safety
 
-- Keep: metadata.ts structure, JSON-LD Person schema (update `knowsAbout` to add GSAP/Motion; fix `sameAs` URLs to the real handles in `CONTACT_LINKS`), sitemap.ts, robots config, canonical, analytics.
+- Keep: metadata.ts structure, JSON-LD Person schema (jobTitle "Software Development Engineer II", worksFor Trential, `knowsAbout` adds React Native/GSAP/Motion; `sameAs` uses the real handles in `CONTACT_LINKS`), sitemap.ts, robots config, canonical, analytics.
 - Anchor slugs `#projects`, `#experience`, `#blog`, `#contact` preserved; `#lab`, `#about` added; `#tech-stack`, `#certifications`, `#resume` removed from nav (dead anchors are harmless but remove stale internal links).
 - `/contact` 301 → `/#contact`.
 - OG image, favicons, webmanifest re-exported in the new brand.
@@ -415,16 +424,21 @@ Work on branch `redesign/canvas-2026`. One commit per phase minimum. Never break
 - **Satoshi + JetBrains Mono:** taste-skill approved pairing; free licenses; variable weight for display punch.
 - **Sticky-stack for work, not horizontal pan:** three chapters read as depth, not breadth; mobile fallback is trivial.
 - **Certifications cut:** 2020-21 entry-level certs undercut a senior design-engineer story; resume keeps them.
+- **Trential chapters lead, Glue chapter anchors:** recency and seniority first (secure wallets, enterprise portals), then the canvas-craft chapter that the hero and Lab visually echo. Dashgen dropped from chapters (not on the LinkedIn record).
 - **Dark-only:** the canvas hero and duotone treatment are designed for dark; a light theme would double every asset and QA cost for near-zero audience gain.
 - **Full stack upgrade up front (Next 16, Tailwind 4, Motion 13):** owner override of the no-churn rule; upgrading before the rebuild means every new component is written once against current APIs (CSS-first tokens, Motion 13 types) instead of migrated later.
 
 ## 12. Inputs still owed by Yash (`[PENDING-INPUT]` registry)
 
-1. Git commit history (refines case-study bullets and may add roles/projects).
-2. xG visual assets; confirmation to use glue.is / dashgen.in screenshots.
+Received Aug 2026: LinkedIn profile PDF + monthly reports Feb-July 2026 (timeline, Trential products, verified facts). Incorporated into Sections 1.1, 2.3, 6.3, 6.5 and `src/data/`.
+
+Still pending:
+1. Trential product visuals + permission (marketing-site assets or app-store screenshots for TruWallet/TruEnroll; portals are auth-walled, no real candidate data ever).
+2. Confirmation to screenshot glue.is; whether Dashgen gets an About mention.
 3. Two short personal paragraphs (or raw facts) for About.
 4. Optional real testimonials (skip section if none).
 5. Confirmation of the "reply within two days" contact promise.
-6. Updated resume PDF if the current one is stale.
+6. **Updated resume PDF** (the bundled `Yash-Sharma-Resume.pdf` predates Trential and is now wrong; replace before Phase 5 ships the About section).
+7. Availability status for the "Now" line (open to offers? not looking?).
 
 None of these block Phases 0-4; slots are structured so content drops in without design changes.

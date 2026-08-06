@@ -60,12 +60,21 @@ export default function RootLayout({
                 CONTACT_LINKS.linkedin,
                 CONTACT_LINKS.twitter,
               ],
-              jobTitle: "Software Engineer",
+              jobTitle: "Software Development Engineer II",
+              worksFor: {
+                "@type": "Organization",
+                name: "Trential",
+              },
+              alumniOf: {
+                "@type": "CollegeOrUniversity",
+                name: "Bennett University",
+              },
               description:
-                "Design engineer building canvas editors, WebGL tools, and high-craft web interfaces.",
+                "Software Development Engineer II building secure wallets, evaluation platforms, and WebGL canvas editors.",
               knowsAbout: [
                 "Web Development",
                 "React",
+                "React Native",
                 "Next.js",
                 "TypeScript",
                 "WebGL",

@@ -9,12 +9,12 @@ export default function Work() {
           Selected work 2022-2026
         </p>
         <h2 className="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">
-          Three products, one canvas obsession.
+          Three products, shipped and in production.
         </h2>
         <div className="mt-12 space-y-8">
-          <Placeholder phase={2} note="Glue chapter (sticky-stack)" />
-          <Placeholder phase={2} note="Dashgen chapter" />
-          <Placeholder phase={2} note="xG chapter" />
+          <Placeholder phase={2} note="TruWallet chapter (sticky-stack)" />
+          <Placeholder phase={2} note="TruEnroll chapter" />
+          <Placeholder phase={2} note="Glue canvas suite chapter" />
         </div>
       </div>
     </section>

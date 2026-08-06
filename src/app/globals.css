@@ -86,3 +86,47 @@ p {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/*
+  Hero entrance (PRD 6.1): headline lines mask-reveal upward with an 80ms
+  stagger, subtext + CTAs fade up after 200ms. Pure CSS: runs off the main
+  thread and server-renders the text. One-time only.
+*/
+.hero-line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero-line-inner {
+  display: block;
+  transform: translateY(110%);
+  animation: hero-rise 600ms var(--ease-out) forwards;
+}
+
+.hero-fade {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: hero-fade-up 600ms var(--ease-out) 200ms forwards;
+}
+
+@keyframes hero-rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-line-inner,
+  .hero-fade {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}
