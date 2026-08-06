@@ -434,7 +434,7 @@ Received Aug 2026: LinkedIn profile PDF + monthly reports Feb-July 2026 (timelin
 
 Still pending:
 1. Trential product visuals + permission (marketing-site assets or app-store screenshots for TruWallet/TruEnroll; portals are auth-walled, no real candidate data ever).
-2. Confirmation to screenshot glue.is; whether Dashgen gets an About mention.
+2. Glue canvas suite visuals: glue.is no longer resolves and gluelabs.com pivoted to an unrelated product (verified Aug 2026), so nothing truthful can be captured live. Yash must supply editor screenshots or recordings; the chapter ships a labeled placeholder and no external link until then. Also: whether Dashgen gets an About mention.
 3. Two short personal paragraphs (or raw facts) for About.
 4. Optional real testimonials (skip section if none).
 5. Confirmation of the "reply within two days" contact promise.

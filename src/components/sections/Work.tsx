@@ -1,4 +1,4 @@
-import Placeholder from "./Placeholder";
+import WorkChapters from "@/components/work/WorkChapters";
 
 /** Selected Work (PRD 6.3). Eyebrow 1 of 2 on the page. */
 export default function Work() {
@@ -11,11 +11,10 @@ export default function Work() {
         <h2 className="mt-4 text-3xl font-bold tracking-tight text-ink md:text-5xl">
           Three products, shipped and in production.
         </h2>
-        <div className="mt-12 space-y-8">
-          <Placeholder phase={2} note="TruWallet chapter (sticky-stack)" />
-          <Placeholder phase={2} note="TruEnroll chapter" />
-          <Placeholder phase={2} note="Glue canvas suite chapter" />
-        </div>
+      </div>
+      {/* Chapters escape the container: pinned cards need full-width room */}
+      <div className="px-5 md:px-8">
+        <WorkChapters />
       </div>
     </section>
   );

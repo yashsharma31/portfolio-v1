@@ -68,11 +68,13 @@ export const PROJECTS: Project[] = [
       { value: "50%", label: "faster campaign setup" },
     ],
     stack: ["Pixi.js", "React", "Next.js", "Slate.js", "TypeScript"],
-    url: "https://glue.is",
+    // No public URL: glue.is no longer resolves and gluelabs.com pivoted to a
+    // different product (checked Aug 2026). PENDING-INPUT: editor screenshots.
     image: {
       src: "/images/work/glue.png",
       alt: "Glue canvas editor interface",
       frame: "browser",
+      pending: true,
     },
   },
 ];
