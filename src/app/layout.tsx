@@ -1,14 +1,35 @@
 import "./globals.css";
-import { Poppins } from "next/font/google";
-import Navbar from "@components/navbar";
-import { metadata } from "./metadata";
-import { Analytics } from "@vercel/analytics/react";
+import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react";
+import Navbar from "@/components/Navbar";
+import GrainOverlay from "@/components/GrainOverlay";
+import SmoothScroll from "@/components/providers/SmoothScroll";
+import { metadata } from "./metadata";
+import { CONTACT_LINKS } from "@/utils/constants";
 
-const poppins = Poppins({
+const satoshi = localFont({
+  src: [
+    {
+      path: "../fonts/Satoshi-Variable.woff2",
+      weight: "300 900",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Satoshi-VariableItalic.woff2",
+      weight: "300 900",
+      style: "italic",
+    },
+  ],
+  variable: "--font-satoshi",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-jetbrains",
+  display: "swap",
 });
 
 export { metadata };
@@ -19,7 +40,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} antialiased`}>
+    <html
+      lang="en"
+      className={`${satoshi.variable} ${jetbrainsMono.variable} antialiased`}
+    >
       <body>
         <Script
           id="schema-org"
@@ -29,16 +53,16 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Yash Sharma",
-              url: "https://yashsharma.com",
+              url: "https://sharmayash.com",
               image: "/images/profile.jpeg",
               sameAs: [
-                "https://github.com/yash-sh",
-                "https://linkedin.com/in/yash-sh",
-                "https://twitter.com/yash_sh0031",
+                CONTACT_LINKS.github,
+                CONTACT_LINKS.linkedin,
+                CONTACT_LINKS.twitter,
               ],
               jobTitle: "Software Engineer",
               description:
-                "Software engineer specializing in building exceptional digital experiences.",
+                "Design engineer building canvas editors, WebGL tools, and high-craft web interfaces.",
               knowsAbout: [
                 "Web Development",
                 "React",
@@ -46,12 +70,23 @@ export default function RootLayout({
                 "TypeScript",
                 "WebGL",
                 "Pixi.js",
+                "GSAP",
+                "Motion",
               ],
             }),
           }}
         />
+        <a
+          href="#top"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-page"
+          style={{ zIndex: "var(--z-overlay)" }}
+        >
+          Skip to content
+        </a>
+        <SmoothScroll />
         <Navbar />
         <main>{children}</main>
+        <GrainOverlay />
         <Analytics />
       </body>
     </html>

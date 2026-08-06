@@ -133,7 +133,7 @@ Rules:
 - **Display + UI: Satoshi Variable** (Fontshare, free license). Self-hosted via `next/font/local`, `font-display: swap`, weights 400-900 variable.
 - **Mono: JetBrains Mono** via `next/font/google`, used for: all numerals/stats, code, nav-adjacent metadata, GitHub data. `font-variant-numeric: tabular-nums` on all stat numbers.
 - Poppins is removed.
-- Scale: display headlines `clamp(2.5rem, 8vw, 7.5rem)`, `tracking-tighter`, `leading-[0.95]`; section headers `text-3xl md:text-5xl tracking-tight`; body `text-base md:text-lg text-[--text-secondary] leading-relaxed max-w-[65ch]`.
+- Scale: display headlines `clamp(2.5rem, 6vw, 5rem)`, `tracking-tighter`, `leading-[0.95]` (verified: keeps the locked hero headline at exactly 2 lines at 1440px inside the 1200px container); section headers `text-3xl md:text-5xl tracking-tight`; body `text-base md:text-lg text-[--text-secondary] leading-relaxed max-w-[65ch]`.
 - Emphasis inside headlines: same-family italic or a weight jump, never a second family, never gradient text.
 - `text-wrap: balance` on all headlines, `text-wrap: pretty` on body.
 

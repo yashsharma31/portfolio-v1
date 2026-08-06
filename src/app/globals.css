@@ -1,43 +1,88 @@
 @import 'tailwindcss';
 
+/*
+  Design tokens (PRD Section 3). The only color values allowed in the app.
+  Utilities: bg-page, bg-elevated, bg-subtle, border-line, border-line-strong,
+  text-ink, text-ink-secondary, text-ink-tertiary, text-accent, text-accent-soft.
+  ("page" not "base" because text-base is Tailwind's font-size utility.)
+*/
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-page: #0b0b0d;
+  --color-elevated: #131316;
+  --color-subtle: #1a1a1f;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.16);
+  --color-ink: #f4f4f5;
+  --color-ink-secondary: #a1a1aa;
+  --color-ink-tertiary: #63636b;
+  --color-accent: #e8763a;
+  --color-accent-soft: #f09a6b;
+  --color-accent-glow: rgb(232 118 58 / 0.14);
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+/* Fonts arrive at runtime via next/font CSS variables, so reference them inline. */
+@theme inline {
+  --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, 'SF Mono', monospace;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --font-primary: var(--font-poppins);
+  /* Motion tokens (PRD 3.5) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 140ms;
+  --dur-ui: 200ms;
+  --dur-reveal: 600ms;
+
+  /* Z scale (PRD 3.3). Mirrored in src/utils/z.ts. */
+  --z-canvas: 0;
+  --z-content: 10;
+  --z-nav: 40;
+  --z-overlay: 50;
+  --z-grain: 60;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  /* Anchor targets clear the 64px fixed nav */
+  scroll-padding-top: 5rem;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-primary);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-page);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Numbers never shift width (stats, clock, metadata) */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
