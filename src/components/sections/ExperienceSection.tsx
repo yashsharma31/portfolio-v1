@@ -1,7 +1,7 @@
 import Reveal from "@/components/motion/Reveal";
 import ExperienceRail from "@/components/experience/ExperienceRail";
 
-/** Experience (PRD 6.5). No eyebrow. Overflow clipped for ghost year numerals. */
+/** Experience (PRD 6.5). No eyebrow. Overflow clipped; year digits are organism particles. */
 export default function ExperienceSection() {
   return (
     <section

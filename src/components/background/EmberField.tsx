@@ -19,6 +19,7 @@ import {
   type AiFormations,
 } from "./aiFormations";
 import { burstControl } from "./burstControl";
+import { sampleYearDigits } from "./digitFormations";
 import { fieldControl } from "./fieldControl";
 import { organismState } from "./organismState";
 import { startSceneController } from "./sceneController";
@@ -33,6 +34,8 @@ import { startSceneController } from "./sceneController";
 
 const EMBER_RAMP = [0xc85f2e, 0xe8763a, 0xf09a6b, 0xffe8d6, 0xffffff] as const;
 const EMBER_CDF = [0.25, 0.6, 0.85, 0.95, 1] as const;
+/** Year digits: cream + white only (orange reads as noise at this scale). */
+const YEAR_TINTS = [0xffe8d6, 0xffffff, 0xffffff, 0xffffff] as const;
 
 const REF_W = 1440;
 const REF_H = 900;
@@ -488,13 +491,24 @@ function applyProofTargets(embers: Ember[], n: number): boolean {
   return true;
 }
 
-function applyExperienceTargets(embers: Ember[], n: number) {
+/** Last active year — used to snap particles when the glyph changes. */
+let lastExperienceYear = "";
+
+/**
+ * Experience motif: thin left rail + bright right-side year digits.
+ * Returns `railN` so the ticker can disperse-blend only the rail — year
+ * particles stay locked to the glyph (otherwise the blend washes them out).
+ */
+function applyExperienceTargets(
+  embers: Ember[],
+  n: number
+): { railN: number } {
   const rail = document.querySelector("[data-experience-rail]");
   if (!rail) {
     for (let i = 0; i < n; i++) {
       embers[i].targetAlpha = 0.04;
     }
-    return;
+    return { railN: 0 };
   }
   const rect = rail.getBoundingClientRect();
   const x = rect.left + 10;
@@ -516,10 +530,30 @@ function applyExperienceTargets(embers: Ember[], n: number) {
     }
   }
 
-  // Sparse rail: ~1 particle per 5px of visible track + accent cluster.
-  const railN = Math.min(n, Math.max(48, Math.floor(span / 5)));
-  const denseN = hasAccent ? Math.min(Math.floor(railN * 0.4), 40) : 0;
-  const lineN = railN - denseN;
+  // Active year slot only (inactive entries omit the attribute).
+  const yearEl = document.querySelector<HTMLElement>(
+    "[data-experience-entry][data-active] [data-experience-year]"
+  );
+  const year = yearEl?.getAttribute("data-experience-year")?.trim() ?? "";
+  const yearPts = year ? sampleYearDigits(year) : new Float32Array(0);
+  const yearPointN = yearPts.length / 2;
+  let yearRect: DOMRect | null = null;
+  if (yearEl && yearPointN > 0) {
+    const yr = yearEl.getBoundingClientRect();
+    // Slot uses the same aspect as the sampler canvas — map 1:1.
+    if (yr.width > 16 && yr.height > 16) yearRect = yr;
+  }
+
+  const yearChanged = year !== lastExperienceYear;
+  lastExperienceYear = year;
+
+  // Lean rail; majority of pool → year glyph.
+  const railBudget = Math.min(n, Math.max(28, Math.floor(n * 0.12)));
+  const denseN = hasAccent ? Math.min(Math.floor(railBudget * 0.45), 20) : 0;
+  const lineN = railBudget - denseN;
+  const yearBudget = yearRect
+    ? Math.min(n - railBudget, yearPointN, Math.floor(n * 0.88))
+    : 0;
 
   for (let i = 0; i < n; i++) {
     const e = embers[i];
@@ -527,20 +561,53 @@ function applyExperienceTargets(embers: Ember[], n: number) {
       const t = i / Math.max(1, denseN - 1);
       e.tx = x + (hash01(i, 41) - 0.5) * 6;
       e.ty = accentTop + t * Math.max(1, accentBot - accentTop);
-      e.size = 2.2 + hash01(i, 45) * 1.1;
-      e.targetAlpha = 0.36 + hash01(i, 42) * 0.08;
+      e.size = 2.0 + hash01(i, 45) * 1.0;
+      e.targetAlpha = 0.28 + hash01(i, 42) * 0.08;
     } else if (i < denseN + lineN) {
       const t = (i - denseN) / Math.max(1, lineN - 1);
       e.tx = x + (hash01(i, 43) - 0.5) * 3.5;
       e.ty = y0 + t * span;
-      e.size = 1.8 + hash01(i, 46) * 0.9;
-      e.targetAlpha = 0.2 + hash01(i, 44) * 0.1;
+      e.size = 1.5 + hash01(i, 46) * 0.7;
+      e.targetAlpha = 0.14 + hash01(i, 44) * 0.06;
+    } else if (yearRect && i < denseN + lineN + yearBudget) {
+      const yi = i - denseN - lineN;
+      // Even subsample across the full glyph (never modulo — that ghosts digits).
+      const pi =
+        yearBudget >= yearPointN
+          ? yi
+          : Math.min(
+              yearPointN - 1,
+              Math.floor((yi + 0.5) * (yearPointN / yearBudget))
+            );
+      const u = yearPts[pi * 2];
+      const v = yearPts[pi * 2 + 1];
+      e.tx = yearRect.left + u * yearRect.width;
+      e.ty = yearRect.top + v * yearRect.height;
+      // Texture.WHITE is 1×1 — scale is px. Slight overlap closes stroke gaps.
+      e.size = 3.6 + hash01(i, 49) * 1.6;
+      e.targetAlpha = 1;
+      e.tint = YEAR_TINTS[Math.floor(hash01(i, 51) * YEAR_TINTS.length)];
+      // Snap on year change; otherwise lock hard so digits don't smear while lerping.
+      if (yearChanged) {
+        e.x = e.tx;
+        e.y = e.ty;
+        e.baseAlpha = e.targetAlpha;
+      } else {
+        e.x = e.tx;
+        e.y = e.ty;
+      }
     } else {
+      // Silence leftovers from the previous year so they don't ghost.
       e.tx = x;
       e.ty = y0 + span * 0.5;
       e.targetAlpha = 0;
+      if (yearChanged) {
+        e.baseAlpha = 0;
+      }
     }
   }
+
+  return { railN: denseN + lineN };
 }
 
 function applyContactTargets(embers: Ember[], n: number) {
@@ -1247,8 +1314,11 @@ export default function EmberField() {
           silenceSurplus(embers, motifN, poolN);
         } else if (scene === "experience") {
           lineGfx.clear();
-          applyExperienceTargets(embers, motifN);
-          blendFormationWithDisperse(embers, motifN, time, progress);
+          // Year digits stay fully formed; only the rail softens with disperse.
+          const { railN } = applyExperienceTargets(embers, motifN);
+          if (railN > 0) {
+            blendFormationWithDisperse(embers, railN, time, progress);
+          }
           silenceSurplus(embers, motifN, poolN);
         } else if (scene === "lab") {
           lineGfx.clear();
@@ -1297,13 +1367,14 @@ export default function EmberField() {
           e.y += (e.ty - e.y) * k;
 
           const twinkle =
-            scene === "hero" || scene === "ai"
+            scene === "hero" || scene === "ai" || scene === "experience"
               ? 1
               : 0.85 +
                 0.15 * Math.sin(time * e.twinkleSpeed + e.twinklePhase);
           let a = e.targetAlpha * twinkle;
           if (bursting && i < BURST_COUNT) a = Math.min(0.55, a);
           else if (scene === "hero" || scene === "ai") a = Math.min(1, a);
+          else if (scene === "experience") a = Math.min(1, a);
           else if (scene === "disperse") a = Math.min(DISPERSE_ALPHA_CAP, a);
           else if (scene === "dormant") a = Math.min(DORMANT_ALPHA_CAP, a);
           else a = Math.min(0.35, a);

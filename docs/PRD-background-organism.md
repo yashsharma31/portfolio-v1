@@ -53,7 +53,7 @@ Reading: *the page scrolls; the background keeps inventing and releasing shapes 
 | S2 | ProofBar | Assemble contribution lattice → disperse on leave |
 | S3 | Work (pinned) | Stay dispersed / nearly off (chapters own the stage) |
 | S4 | Lab | Assemble soft edge scatter around the bento → disperse |
-| S5 | Experience | Assemble timeline rail → disperse |
+| S5 | Experience | Assemble timeline rail + active year digits (right) → disperse |
 | S6 | AI journey | Assemble five formations scrubbed by pin progress (`journeyScrub`) → disperse on leave |
 | S7 | Writing | Assemble thin text-line motif → disperse |
 | S8 | About | Assemble loose halo behind portrait → disperse |
