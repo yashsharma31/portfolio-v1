@@ -46,3 +46,11 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
+
+# playwright artifacts
+/test-results/
+/playwright-report/
+/tests/__screenshots__/
+
+# Raw art sources (not shipped)
+assets-src/

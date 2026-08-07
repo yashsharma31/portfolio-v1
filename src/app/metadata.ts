@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 const SITE_URL = "https://sharmayash.com";
 const PROFILE_DESCRIPTION =
-  "Software engineer specializing in React, Next.js, and modern web technologies. Experienced in building exceptional digital experiences with expertise in WebGL, TypeScript, and UI/UX design.";
+  "Software Development Engineer II at Trential with 4+ years in the React ecosystem. Builds secure wallets, evaluation platforms, and WebGL canvas editors with React, React Native, Next.js, and TypeScript.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     "Software Engineer",
     "Web Developer",
     "React Developer",
+    "React Native Developer",
     "Next.js Developer",
     "Frontend Engineer",
     "Full Stack Developer",

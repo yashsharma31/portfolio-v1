@@ -13,9 +13,11 @@ export async function getMediumPosts(): Promise<MediumPost[]> {
     if (!response.ok) {
       throw new Error("Failed to fetch posts");
     }
-    return response.json();
-  } catch (error) {
-    console.error("Error fetching posts:", error);
+    const data = await response.json();
+    if (!Array.isArray(data)) return [];
+    return data as MediumPost[];
+  } catch {
+    // Soft-fail: WritingRows shows the Medium profile fallback.
     return [];
   }
 }

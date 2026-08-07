@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["cdn-images-1.medium.com"],
     unoptimized: false,
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",
@@ -13,6 +13,15 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/contact",
+        destination: "/#contact",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
