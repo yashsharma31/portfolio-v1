@@ -26,14 +26,17 @@ const CAPTIONS: Record<string, string | null> = {
   glue: "Illustrative recreation.",
 };
 
+/** Shared desktop card box — phone and browser chapters occupy the same space. */
+const CARD_BOX =
+  "lg:h-[560px] lg:max-h-[calc(100dvh-9rem)]";
+
 /**
- * Selected Work sticky-stack (PRD 5.2/6.3, taste-skill 5.A canonical
- * skeleton). Desktop only: cards pin at viewport top, the previous card
- * scales to 0.92 / dims to 0.55 as the next arrives. Below lg and under
- * reduced motion the cards are a plain stacked list.
+ * Selected Work sticky-stack (PRD 5.2/6.3).
  *
- * Product visuals are code-drawn abstract skeletons (auth-walled products;
- * screenshots may never arrive). Caption discloses they are illustrative.
+ * Stacking is pure CSS sticky (no GSAP pin) so Lenis never fights a
+ * pinSpacing:false spacer — that fight was the scroll "jerk". GSAP only
+ * scrubs scale/opacity as the next card arrives. All chapters share one
+ * fixed card height so the handoff does not change spacing.
  */
 export default function WorkChapters() {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,43 +51,47 @@ export default function WorkChapters() {
       );
       cardEls.forEach((card, i) => {
         if (i === cardEls.length - 1) return;
-        ScrollTrigger.create({
-          trigger: card,
-          start: "top top",
-          endTrigger: cardEls[cardEls.length - 1],
-          end: "top top",
-          pin: true,
-          pinSpacing: false,
-        });
+
+        // Scale from the top center so width/side gutters do not jump as the
+        // previous card dims — keeps the stack aligned under the nav.
+        gsap.set(card, { transformOrigin: "50% 0%" });
+
         gsap.to(card, {
           scale: 0.92,
           opacity: 0.55,
           ease: "none",
           scrollTrigger: {
             trigger: cardEls[i + 1],
-            start: "top bottom",
-            end: "top top",
+            // Start scaling only once the next card has entered, not the
+            // instant the tall min-height wrapper appears at the viewport bottom.
+            start: "top 85%",
+            end: "top 64px",
             scrub: true,
+            invalidateOnRefresh: true,
           },
         });
+
         const visual = card.querySelector(".chapter-visual");
         if (visual) {
           gsap.fromTo(
             visual,
             { y: 0 },
             {
-              y: -20,
+              y: -16,
               ease: "none",
               scrollTrigger: {
                 trigger: cardEls[i + 1],
-                start: "top bottom",
-                end: "top top",
+                start: "top 85%",
+                end: "top 64px",
                 scrub: true,
+                invalidateOnRefresh: true,
               },
             }
           );
         }
       });
+
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     });
     return () => mm.revert();
   }, [reduce]);
@@ -97,8 +104,8 @@ export default function WorkChapters() {
           className={cn(
             "stack-card",
             !reduce &&
-              "lg:sticky lg:top-0 lg:flex lg:min-h-[100dvh] lg:items-center",
-            "py-6 lg:py-0"
+              "lg:sticky lg:top-20 lg:flex lg:min-h-[calc(100dvh-5rem)] lg:items-center lg:py-8",
+            "py-6 lg:py-8"
           )}
         >
           <Chapter project={project} index={index} />
@@ -114,18 +121,21 @@ function Chapter({ project, index }: { project: Project; index: number }) {
   const caption = CAPTIONS[project.slug];
 
   return (
-    <article className="relative mx-auto w-full max-w-[1200px] overflow-hidden rounded-2xl border border-line bg-elevated px-6 py-8 md:px-10 md:py-10 lg:my-8">
-      {/* Ghost numeral: white ~5.5% over #131316 reads quietly but clearly.
-          Bottom-left, under the text column, so it never collides with the visual. */}
+    <article
+      className={cn(
+        "relative mx-auto flex w-full max-w-[1200px] flex-col justify-center overflow-hidden rounded-2xl border border-line bg-elevated px-6 py-8 md:px-10 md:py-10",
+        CARD_BOX
+      )}
+    >
       <span
         aria-hidden
-        className="pointer-events-none absolute -bottom-10 -left-2 select-none font-mono text-[240px] leading-none tracking-tighter md:text-[280px] lg:text-[320px]"
+        className="pointer-events-none absolute bottom-2 left-4 select-none font-mono text-[clamp(7.5rem,14vw,11rem)] leading-none tracking-tighter md:bottom-3 md:left-6"
         style={{ color: "rgb(255 255 255 / 0.055)" }}
       >
         {numeral}
       </span>
 
-      <div className="relative grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
+      <div className="relative grid flex-1 items-center gap-8 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-5">
           <h3 className="text-3xl font-bold tracking-tight text-ink md:text-4xl">
             {project.name}
@@ -177,14 +187,16 @@ function Chapter({ project, index }: { project: Project; index: number }) {
           )}
         </div>
 
-        <div className="chapter-visual lg:col-span-7">
-          {project.image.frame === "phone" ? (
-            <PhoneFrame>{Visual ? <Visual /> : null}</PhoneFrame>
-          ) : (
-            <BrowserFrame>{Visual ? <Visual /> : null}</BrowserFrame>
-          )}
+        <div className="chapter-visual flex h-full min-h-0 flex-col justify-center lg:col-span-7">
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            {project.image.frame === "phone" ? (
+              <PhoneFrame>{Visual ? <Visual /> : null}</PhoneFrame>
+            ) : (
+              <BrowserFrame>{Visual ? <Visual /> : null}</BrowserFrame>
+            )}
+          </div>
           {caption && (
-            <p className="mt-3 font-mono text-[11px] leading-snug text-ink-tertiary">
+            <p className="mt-3 shrink-0 font-mono text-[11px] leading-snug text-ink-tertiary">
               {caption}
             </p>
           )}
@@ -196,21 +208,21 @@ function Chapter({ project, index }: { project: Project; index: number }) {
 
 function BrowserFrame({ children }: { children: ReactNode }) {
   return (
-    <figure className="overflow-hidden rounded-2xl border border-line bg-subtle">
+    <figure className="w-full overflow-hidden rounded-2xl border border-line bg-subtle">
       <div className="flex items-center gap-1.5 border-b border-line px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
         <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
         <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
       </div>
-      <div className="relative aspect-[16/10]">{children}</div>
+      <div className="relative aspect-[16/10] w-full">{children}</div>
     </figure>
   );
 }
 
 function PhoneFrame({ children }: { children: ReactNode }) {
   return (
-    <figure className="mx-auto w-full max-w-[300px] lg:ml-auto lg:mr-8 lg:max-w-[320px]">
-      <div className="overflow-hidden rounded-[32px] border-4 border-subtle bg-subtle shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
+    <figure className="mx-auto w-full max-w-[220px] lg:ml-auto lg:mr-8 lg:max-w-[240px]">
+      <div className="overflow-hidden rounded-[28px] border-4 border-subtle bg-subtle shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
         <div className="relative aspect-[39/80]">{children}</div>
       </div>
     </figure>
