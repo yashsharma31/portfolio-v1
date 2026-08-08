@@ -19,10 +19,14 @@ import {
   type AiFormations,
 } from "./aiFormations";
 import { burstControl } from "./burstControl";
-import { sampleYearDigits } from "./digitFormations";
+import {
+  sampleYearDigits,
+  warmYearDigits,
+} from "./digitFormations";
 import { fieldControl } from "./fieldControl";
 import { organismState } from "./organismState";
 import { startSceneController } from "./sceneController";
+import { EXPERIENCE } from "@/data/experience";
 
 /**
  * Ember Organism engine (B1–B3). Fixed full-viewport Pixi canvas.
@@ -36,6 +40,9 @@ const EMBER_RAMP = [0xc85f2e, 0xe8763a, 0xf09a6b, 0xffe8d6, 0xffffff] as const;
 const EMBER_CDF = [0.25, 0.6, 0.85, 0.95, 1] as const;
 /** Year digits: cream + white only (orange reads as noise at this scale). */
 const YEAR_TINTS = [0xffe8d6, 0xffffff, 0xffffff, 0xffffff] as const;
+/** Soft-dot texture diameter in px. Particle `size` is visual px; scale = size / DOT_TEX. */
+const DOT_TEX = 16;
+const DOT_TEX_R = DOT_TEX / 2;
 
 const REF_W = 1440;
 const REF_H = 900;
@@ -44,6 +51,8 @@ const DRIFT_MIN = 50;
 const CHOREO_REF = 700;
 const CHOREO_MIN = 350;
 const CHOREO_MAX = 800;
+/** Experience year digits need a denser pool than other motifs. */
+const YEAR_POOL = 1600;
 const HERO_POOL_MAX = 2500;
 const HERO_GRID_COLS = 128;
 const HERO_LUM_THRESHOLD = 0.095;
@@ -120,6 +129,15 @@ function pickTint() {
 function hash01(i: number, salt = 1) {
   const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
   return x - Math.floor(x);
+}
+
+/** Soft circular particle texture (no filters — Pixi v8 BindGroup crash). */
+function makeSoftDotTexture(app: Application): Texture {
+  // Hard disc — EmberBrush pattern, proven in ParticleContainer.
+  const gfx = new Graphics().circle(0, 0, DOT_TEX_R).fill(0xffffff);
+  const texture = app.renderer.generateTexture(gfx);
+  gfx.destroy();
+  return texture;
 }
 
 function prefersReduce() {
@@ -286,8 +304,8 @@ function seedDrift(e: Ember, w: number, h: number, y?: number) {
   p.y = e.y;
   p.tint = e.tint;
   p.alpha = e.baseAlpha;
-  p.scaleX = size;
-  p.scaleY = size;
+  p.scaleX = size / DOT_TEX;
+  p.scaleY = size / DOT_TEX;
 }
 
 function seedChoreo(e: Ember, i: number, n: number, w: number, h: number) {
@@ -326,8 +344,8 @@ function seedChoreo(e: Ember, i: number, n: number, w: number, h: number) {
   p.y = e.y;
   p.tint = e.tint;
   p.alpha = e.homeAlpha;
-  p.scaleX = e.size;
-  p.scaleY = e.size;
+  p.scaleX = e.size / DOT_TEX;
+  p.scaleY = e.size / DOT_TEX;
 }
 
 function bindHeroSample(e: Ember, sample: ArtSample) {
@@ -491,24 +509,32 @@ function applyProofTargets(embers: Ember[], n: number): boolean {
   return true;
 }
 
-/** Last active year — used to snap particles when the glyph changes. */
+/** Last active year — morph (don't snap) when the glyph changes. */
 let lastExperienceYear = "";
 
+function smoothstep01(t: number) {
+  const x = Math.max(0, Math.min(1, t));
+  return x * x * (3 - 2 * x);
+}
+
 /**
- * Experience motif: thin left rail + bright right-side year digits.
- * Returns `railN` so the ticker can disperse-blend only the rail — year
- * particles stay locked to the glyph (otherwise the blend washes them out).
+ * Experience motif: thin left rail + bright sticky year digits.
+ * Year particles ease toward targets (scroll morph); scroll velocity adds
+ * a brief shear that settles. Returns `railN` for disperse blending.
  */
 function applyExperienceTargets(
   embers: Ember[],
-  n: number
-): { railN: number } {
+  n: number,
+  time: number,
+  scrollVel: number,
+  progress: number
+): { railN: number; yearN: number } {
   const rail = document.querySelector("[data-experience-rail]");
   if (!rail) {
     for (let i = 0; i < n; i++) {
       embers[i].targetAlpha = 0.04;
     }
-    return { railN: 0 };
+    return { railN: 0, yearN: 0 };
   }
   const rect = rail.getBoundingClientRect();
   const x = rect.left + 10;
@@ -530,30 +556,40 @@ function applyExperienceTargets(
     }
   }
 
-  // Active year slot only (inactive entries omit the attribute).
-  const yearEl = document.querySelector<HTMLElement>(
-    "[data-experience-entry][data-active] [data-experience-year]"
-  );
+  // Sticky year slot (one rect for the whole rail).
+  const yearEl = document.querySelector<HTMLElement>("[data-experience-year]");
   const year = yearEl?.getAttribute("data-experience-year")?.trim() ?? "";
   const yearPts = year ? sampleYearDigits(year) : new Float32Array(0);
   const yearPointN = yearPts.length / 2;
   let yearRect: DOMRect | null = null;
   if (yearEl && yearPointN > 0) {
     const yr = yearEl.getBoundingClientRect();
-    // Slot uses the same aspect as the sampler canvas — map 1:1.
     if (yr.width > 16 && yr.height > 16) yearRect = yr;
   }
 
-  const yearChanged = year !== lastExperienceYear;
+  const yearChanged = year !== lastExperienceYear && year.length > 0;
   lastExperienceYear = year;
 
-  // Lean rail; majority of pool → year glyph.
-  const railBudget = Math.min(n, Math.max(28, Math.floor(n * 0.12)));
-  const denseN = hasAccent ? Math.min(Math.floor(railBudget * 0.45), 20) : 0;
+  // Lean rail; majority of elevated pool → year glyph.
+  const railBudget = Math.min(n, Math.max(24, Math.floor(n * 0.06)));
+  const denseN = hasAccent ? Math.min(Math.floor(railBudget * 0.45), 16) : 0;
   const lineN = railBudget - denseN;
   const yearBudget = yearRect
-    ? Math.min(n - railBudget, yearPointN, Math.floor(n * 0.88))
+    ? Math.min(n - railBudget, yearPointN, Math.floor(n * 0.94))
     : 0;
+
+  // Assemble quickly once Experience owns the scene; don't wait on low band scores.
+  const yearForm = Math.max(0.85, smoothstep01((progress - 0.02) / 0.18));
+  const shake = Math.min(1, Math.abs(scrollVel) / 1400);
+  const scrollSign = scrollVel >= 0 ? 1 : -1;
+
+  // Size so neighboring samples overlap slightly → solid stipple, not sand.
+  const cover =
+    yearRect && yearBudget > 0
+      ? Math.sqrt(
+          (yearRect.width * yearRect.height * 0.48) / Math.max(1, yearBudget)
+        )
+      : 3;
 
   for (let i = 0; i < n; i++) {
     const e = embers[i];
@@ -581,33 +617,37 @@ function applyExperienceTargets(
             );
       const u = yearPts[pi * 2];
       const v = yearPts[pi * 2 + 1];
-      e.tx = yearRect.left + u * yearRect.width;
-      e.ty = yearRect.top + v * yearRect.height;
-      // Texture.WHITE is 1×1 — scale is px. Slight overlap closes stroke gaps.
-      e.size = 3.6 + hash01(i, 49) * 1.6;
-      e.targetAlpha = 1;
+      // Micro breath only — large drift makes digits look unfinished.
+      const breathX = Math.sin(time * 0.4 + e.phase) * 0.35;
+      const breathY = Math.cos(time * 0.32 + e.phase * 1.2) * 0.35;
+      const shearY = scrollSign * shake * (4 + hash01(i, 72) * 10);
+      const shearX = (hash01(i, 71) - 0.5) * shake * 7;
+
+      e.tx = yearRect.left + u * yearRect.width + breathX + shearX;
+      e.ty = yearRect.top + v * yearRect.height + breathY + shearY;
+      e.size = Math.max(2.2, Math.min(4.8, cover * (1.05 + hash01(i, 49) * 0.2)));
+      // Keep the glyph present but quiet — timeline copy owns attention.
+      e.targetAlpha = (0.38 + hash01(i, 50) * 0.12) * yearForm;
       e.tint = YEAR_TINTS[Math.floor(hash01(i, 51) * YEAR_TINTS.length)];
-      // Snap on year change; otherwise lock hard so digits don't smear while lerping.
+
+      // On year change, kick from a short scatter so the morph reads as motion.
       if (yearChanged) {
-        e.x = e.tx;
-        e.y = e.ty;
-        e.baseAlpha = e.targetAlpha;
-      } else {
-        e.x = e.tx;
-        e.y = e.ty;
+        const ang = hash01(i, 80) * Math.PI * 2;
+        const dist = 18 + hash01(i, 81) * 48;
+        e.x = e.tx + Math.cos(ang) * dist;
+        e.y = e.ty + Math.sin(ang) * dist * 0.55;
+        e.stagger = hash01(i, 82);
       }
     } else {
-      // Silence leftovers from the previous year so they don't ghost.
-      e.tx = x;
-      e.ty = y0 + span * 0.5;
+      // Silence leftovers so they don't ghost beside the glyph.
+      e.tx = x + (hash01(i, 90) - 0.5) * 40;
+      e.ty = y0 + span * (0.35 + hash01(i, 91) * 0.3);
       e.targetAlpha = 0;
-      if (yearChanged) {
-        e.baseAlpha = 0;
-      }
+      e.size = 1.2;
     }
   }
 
-  return { railN: denseN + lineN };
+  return { railN: denseN + lineN, yearN: yearBudget };
 }
 
 function applyContactTargets(embers: Ember[], n: number) {
@@ -1039,7 +1079,8 @@ export default function EmberField() {
       application.canvas.style.width = "100%";
       application.canvas.style.height = "100%";
 
-      const texture = Texture.WHITE;
+      // Soft circular dots (not 1×1 squares) — polished stipple at year scale.
+      const texture = makeSoftDotTexture(application);
       const pc = new ParticleContainer({
         dynamicProperties: {
           position: true,
@@ -1048,6 +1089,13 @@ export default function EmberField() {
         },
       });
       application.stage.addChild(pc);
+
+      // Warm year glyph samples after fonts settle (avoids empty first cache).
+      const years = EXPERIENCE.map((e) => {
+        const m = e.period.match(/\/(\d{4})/);
+        return m?.[1] ?? "";
+      }).filter(Boolean);
+      void warmYearDigits(years);
 
       const lineGfx = new Graphics();
       application.stage.addChild(lineGfx);
@@ -1088,10 +1136,15 @@ export default function EmberField() {
         }
       }
 
-      // Elevate for AI (~1200) like hero elevates; motifs stay ~800 when not in ai/hero.
+      // Elevate for AI (~1200) and Experience year (~1500) like hero elevates;
+      // other motifs stay ~800 when not in those scenes.
       const aiCap = desktop ? aiPoolCap() : 0;
-      const poolN = desktop ? Math.max(motifN, heroN, aiCap) : motifN;
+      const yearCap = desktop ? YEAR_POOL : 0;
+      const poolN = desktop
+        ? Math.max(motifN, heroN, aiCap, yearCap)
+        : motifN;
       aiN = desktop ? Math.min(poolN, aiCap) : 0;
+      const yearN = desktop ? Math.min(poolN, yearCap) : 0;
       if (desktop && aiN > 0) {
         aiForms = buildFormations(w, h, aiN);
         aiFormW = w;
@@ -1185,8 +1238,8 @@ export default function EmberField() {
             e.particle.y = ay;
             e.particle.tint = e.heroTint;
             e.particle.alpha = 0;
-            e.particle.scaleX = e.size;
-            e.particle.scaleY = e.size;
+            e.particle.scaleX = e.size / DOT_TEX;
+            e.particle.scaleY = e.size / DOT_TEX;
           }
         }
       }
@@ -1254,6 +1307,9 @@ export default function EmberField() {
             p.x = e.x;
             p.y = e.y;
             p.alpha = Math.min(0.3, Math.max(0.04, e.baseAlpha * twinkle));
+            const s = e.size / DOT_TEX;
+            p.scaleX = s;
+            p.scaleY = s;
           }
           pc.update();
           return;
@@ -1275,7 +1331,13 @@ export default function EmberField() {
         const scene = organismState.scene;
         const progress = organismState.progress;
         const activeN =
-          scene === "hero" ? poolN : scene === "ai" ? aiN : motifN;
+          scene === "hero"
+            ? poolN
+            : scene === "ai"
+              ? aiN
+              : scene === "experience"
+                ? yearN
+                : motifN;
 
         let aiStage = 0;
         let aiLocal = 0;
@@ -1314,12 +1376,19 @@ export default function EmberField() {
           silenceSurplus(embers, motifN, poolN);
         } else if (scene === "experience") {
           lineGfx.clear();
-          // Year digits stay fully formed; only the rail softens with disperse.
-          const { railN } = applyExperienceTargets(embers, motifN);
+          const { railN } = applyExperienceTargets(
+            embers,
+            yearN,
+            time,
+            scroll.vel,
+            progress
+          );
+          // Only the rail softens with enter/exit — year digits stay locked
+          // so low band-progress scores don't wash the glyph into dust.
           if (railN > 0) {
             blendFormationWithDisperse(embers, railN, time, progress);
           }
-          silenceSurplus(embers, motifN, poolN);
+          silenceSurplus(embers, yearN, poolN);
         } else if (scene === "lab") {
           lineGfx.clear();
           const ok = applyLabTargets(embers, motifN, time);
@@ -1359,9 +1428,13 @@ export default function EmberField() {
         applyContactBurst(embers, motifN, dt);
 
         const integrateN = activeN;
+        const experienceMorph = scene === "experience";
         for (let i = 0; i < poolN; i++) {
           const e = embers[i];
-          const rate = 3.5 + e.stagger * 6;
+          // Year morph: snappier ease-out so digits reassemble without smearing.
+          const rate = experienceMorph
+            ? 5.5 + e.stagger * 9
+            : 3.5 + e.stagger * 6;
           const k = 1 - Math.exp(-dt * rate);
           e.x += (e.tx - e.x) * k;
           e.y += (e.ty - e.y) * k;
@@ -1395,8 +1468,10 @@ export default function EmberField() {
           }
           p.y = yDraw;
           p.alpha = e.baseAlpha;
-          p.scaleX = e.size;
-          p.scaleY = e.size;
+          // size is visual px; soft texture diameter is DOT_TEX.
+          const s = e.size / DOT_TEX;
+          p.scaleX = s;
+          p.scaleY = s;
           if (bursting && i < BURST_COUNT) {
             p.tint =
               EMBER_RAMP[

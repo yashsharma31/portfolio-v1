@@ -5,13 +5,17 @@
  * lines up with the glyph.
  */
 
-export const YEAR_SAMPLE_W = 520;
-export const YEAR_SAMPLE_H = 240;
-/** Keep in sync with ExperienceRail year slot `aspect-[…]`. */
+export const YEAR_SAMPLE_W = 720;
+export const YEAR_SAMPLE_H = 320;
+/** Keep in sync with ExperienceRail year slot aspect. */
 export const YEAR_ASPECT = YEAR_SAMPLE_W / YEAR_SAMPLE_H;
 
-const LUM_THRESHOLD = 0.2;
-const MAX_POINTS = 620;
+const LUM_THRESHOLD = 0.12;
+/** Dense enough to read as solid stipple, not sand. Match YEAR_POOL. */
+const MAX_POINTS = 1600;
+const GRID = 1.5;
+/** Share of the capped pool reserved for silhouette vs interior fill. */
+const EDGE_SHARE = 0.42;
 
 const cache = new Map<string, Float32Array>();
 
@@ -24,6 +28,18 @@ function lumAt(
 ): number {
   if (x < 0 || y < 0 || x >= w || y >= h) return 0;
   return data[(y * w + x) * 4] / 255;
+}
+
+/** Resolve the live JetBrains Mono face (next/font CSS var) for canvas sampling. */
+function monoFamily(): string {
+  if (typeof document === "undefined") {
+    return '"JetBrains Mono", ui-monospace, monospace';
+  }
+  const fromVar = getComputedStyle(document.documentElement)
+    .getPropertyValue("--font-jetbrains")
+    .trim();
+  if (fromVar) return `${fromVar}, "JetBrains Mono", ui-monospace, monospace`;
+  return '"JetBrains Mono", ui-monospace, monospace';
 }
 
 /**
@@ -48,11 +64,11 @@ export function sampleYearDigits(year: string): Float32Array {
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const size = Math.floor(h * 0.78);
-  ctx.font = `800 ${size}px "JetBrains Mono", ui-monospace, monospace`;
+  const size = Math.floor(h * 0.88);
+  ctx.font = `800 ${size}px ${monoFamily()}`;
   try {
     (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing =
-      "-0.06em";
+      "-0.08em";
   } catch {
     /* ignore */
   }
@@ -61,38 +77,91 @@ export function sampleYearDigits(year: string): Float32Array {
   ctx.fillText(year, w / 2, h / 2 + 2);
 
   const { data } = ctx.getImageData(0, 0, w, h);
-  const pts: number[] = [];
+  const edgePts: number[] = [];
+  const fillPts: number[] = [];
 
-  for (let y = 1; y < h - 1; y += 1) {
-    for (let x = 1; x < w - 1; x += 1) {
-      const lum = lumAt(data, x, y, w, h);
+  // Tight grid, tiny jitter — solid fill, crisp silhouette.
+  for (let y = GRID; y < h - GRID; y += GRID) {
+    for (let x = GRID; x < w - GRID; x += GRID) {
+      const jx = (hash01(x * 0.37 + y * 1.9, 3) - 0.5) * GRID * 0.35;
+      const jy = (hash01(x * 1.1 + y * 0.41, 7) - 0.5) * GRID * 0.35;
+      const sx = Math.round(x + jx);
+      const sy = Math.round(y + jy);
+      const lum = lumAt(data, sx, sy, w, h);
       if (lum < LUM_THRESHOLD) continue;
+
       const edge =
-        lumAt(data, x - 1, y, w, h) < LUM_THRESHOLD ||
-        lumAt(data, x + 1, y, w, h) < LUM_THRESHOLD ||
-        lumAt(data, x, y - 1, w, h) < LUM_THRESHOLD ||
-        lumAt(data, x, y + 1, w, h) < LUM_THRESHOLD;
-      // Keep every edge sample; checker the fill so strokes read solid.
-      if (!edge && ((x + y) & 1) !== 0) continue;
-      pts.push(x / (w - 1), y / (h - 1));
+        lumAt(data, sx - 1, sy, w, h) < LUM_THRESHOLD ||
+        lumAt(data, sx + 1, sy, w, h) < LUM_THRESHOLD ||
+        lumAt(data, sx, sy - 1, w, h) < LUM_THRESHOLD ||
+        lumAt(data, sx, sy + 1, w, h) < LUM_THRESHOLD;
+
+      if (edge) {
+        edgePts.push(sx / (w - 1), sy / (h - 1));
+      } else {
+        // Keep nearly all fill — only drop ~10% for organic texture.
+        if (hash01(sx + sy * 17, 11) > 0.9) continue;
+        fillPts.push(sx / (w - 1), sy / (h - 1));
+      }
     }
   }
 
-  if (pts.length === 0) return new Float32Array(0);
+  // Prefer edges first so silhouette survives when we cap point count.
+  const edgeN = edgePts.length / 2;
+  const fillN = fillPts.length / 2;
+  if (edgeN + fillN === 0) return new Float32Array(0);
 
+  const total = edgeN + fillN;
   let out: Float32Array;
-  if (pts.length / 2 > MAX_POINTS) {
-    const step = pts.length / 2 / MAX_POINTS;
-    out = new Float32Array(MAX_POINTS * 2);
-    for (let i = 0; i < MAX_POINTS; i++) {
-      const src = Math.floor(i * step) * 2;
-      out[i * 2] = pts[src];
-      out[i * 2 + 1] = pts[src + 1];
-    }
+
+  if (total <= MAX_POINTS) {
+    out = new Float32Array(edgePts.length + fillPts.length);
+    out.set(edgePts, 0);
+    out.set(fillPts, edgePts.length);
   } else {
-    out = new Float32Array(pts);
+    // Always keep a solid interior — never collapse to edges-only.
+    const edgeBudget = Math.min(edgeN, Math.floor(MAX_POINTS * EDGE_SHARE));
+    const fillBudget = Math.min(fillN, MAX_POINTS - edgeBudget);
+    out = new Float32Array((edgeBudget + fillBudget) * 2);
+    const eStep = edgeN / Math.max(1, edgeBudget);
+    for (let i = 0; i < edgeBudget; i++) {
+      const src = Math.floor(i * eStep) * 2;
+      out[i * 2] = edgePts[src];
+      out[i * 2 + 1] = edgePts[src + 1];
+    }
+    const fStep = fillN / Math.max(1, fillBudget);
+    for (let i = 0; i < fillBudget; i++) {
+      const src = Math.floor(i * fStep) * 2;
+      const o = (edgeBudget + i) * 2;
+      out[o] = fillPts[src];
+      out[o + 1] = fillPts[src + 1];
+    }
   }
 
   cache.set(year, out);
   return out;
+}
+
+function hash01(n: number, salt: number) {
+  const x = Math.sin(n * 127.1 + salt * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** Drop cached glyphs (call after fonts settle so the first sample isn't a fallback). */
+export function clearYearDigitCache() {
+  cache.clear();
+}
+
+/** Warm cache once fonts are ready so the first Experience frame is dense. */
+export async function warmYearDigits(years: string[]) {
+  if (typeof document === "undefined") return;
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+  } catch {
+    /* ignore */
+  }
+  clearYearDigitCache();
+  for (const y of years) {
+    if (y) sampleYearDigits(y);
+  }
 }

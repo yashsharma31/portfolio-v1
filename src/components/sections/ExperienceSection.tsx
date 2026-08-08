@@ -7,7 +7,7 @@ export default function ExperienceSection() {
     <section
       id="experience"
       aria-label="Work experience"
-      className="overflow-x-clip py-24 md:py-40"
+      className="py-24 md:py-40"
     >
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal>

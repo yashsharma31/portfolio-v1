@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Reveal from "@/components/motion/Reveal";
 import { cn } from "@/utils/cn";
 import { EXPERIENCE, type ExperienceEntry } from "@/data/experience";
+import { YEAR_ASPECT } from "@/components/background/digitFormations";
 
 /**
  * Experience rail (PRD 6.5).
@@ -11,8 +12,9 @@ import { EXPERIENCE, type ExperienceEntry } from "@/data/experience";
  * tracks the in-view entry via IntersectionObserver (no scroll listeners;
  * segment position is written as CSS vars, not React state per frame).
  *
- * Year digits are owned by the organism (EmberField): each entry exposes a
- * right-side `data-experience-year` slot; particles assemble the active year.
+ * Year digits are owned by the organism (EmberField): one sticky
+ * `data-experience-year` slot on the right; particles morph as the active
+ * year changes with scroll.
  */
 
 function startYear(period: string): string {
@@ -34,7 +36,6 @@ function Entry({
   setEntryRef: (i: number, el: HTMLLIElement | null) => void;
 }) {
   const ref = useRef<HTMLLIElement | null>(null);
-  const year = startYear(entry.period);
 
   useEffect(() => {
     const el = ref.current;
@@ -69,56 +70,40 @@ function Entry({
         )}
       />
 
-      <div className="relative z-[1] grid items-start gap-6 pl-5 md:pl-7 lg:grid-cols-12 lg:gap-10">
-        <Reveal
-          delay={Math.min(index * 0.055, 0.22)}
-          className="lg:col-span-7"
-        >
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:gap-y-1">
-            <h3 className="text-xl font-semibold tracking-tight text-ink md:text-2xl">
-              {entry.role}
-              <span className="font-normal text-accent-soft">
-                {" "}
-                · {entry.company}
-              </span>
-            </h3>
-            <span className="font-mono text-xs text-ink-tertiary">
-              {entry.period}
-              {entry.location ? ` · ${entry.location}` : ""}
+      <Reveal
+        delay={Math.min(index * 0.055, 0.22)}
+        className="relative z-[1] pl-5 md:pl-7"
+      >
+        <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3 sm:gap-y-1">
+          <h3 className="text-xl font-semibold tracking-tight text-ink md:text-2xl">
+            {entry.role}
+            <span className="font-normal text-accent-soft">
+              {" "}
+              · {entry.company}
             </span>
-          </div>
+          </h3>
+          <span className="font-mono text-xs text-ink-tertiary">
+            {entry.period}
+            {entry.location ? ` · ${entry.location}` : ""}
+          </span>
+        </div>
 
-          <ul className="mt-5 max-w-[65ch] space-y-2.5 text-[15px] leading-relaxed text-ink-secondary">
-            {entry.bullets.map((b) => (
-              <li key={b} className="flex gap-3">
-                <span
-                  aria-hidden
-                  className="mt-[0.65em] h-[3px] w-2 shrink-0 rounded-full bg-accent"
-                />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
+        <ul className="mt-5 max-w-[65ch] space-y-2.5 text-[15px] leading-relaxed text-ink-secondary">
+          {entry.bullets.map((b) => (
+            <li key={b} className="flex gap-3">
+              <span
+                aria-hidden
+                className="mt-[0.65em] h-[3px] w-2 shrink-0 rounded-full bg-accent"
+              />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
 
-          <p className="mt-6 border-t border-line pt-4 font-mono text-[11px] tracking-wide text-ink-tertiary">
-            {entry.stack.join(" · ")}
-          </p>
-        </Reveal>
-
-        {/*
-          Year particle target. Aspect matches digitFormations SAMPLE (13/6).
-          Empty — no CSS underlay (that doubled/misaligned with the canvas glyph).
-          Always reserve the same box so activating an entry doesn't reflow;
-          only the active entry exposes data-experience-year for sampling.
-        */}
-        {year ? (
-          <div
-            aria-hidden
-            data-experience-year={active ? year : undefined}
-            className="pointer-events-none relative hidden aspect-[13/6] w-full max-w-[440px] justify-self-end lg:col-span-5 lg:block lg:self-center"
-          />
-        ) : null}
-      </div>
+        <p className="mt-6 border-t border-line pt-4 font-mono text-[11px] tracking-wide text-ink-tertiary">
+          {entry.stack.join(" · ")}
+        </p>
+      </Reveal>
     </li>
   );
 }
@@ -128,6 +113,8 @@ export default function ExperienceRail() {
   const railRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const entryRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  const activeYear = startYear(EXPERIENCE[active]?.period ?? "");
 
   const syncSegment = useCallback((index: number) => {
     const rail = railRef.current;
@@ -167,7 +154,7 @@ export default function ExperienceRail() {
     <div
       ref={railRef}
       data-experience-rail
-      className="relative mt-12 overflow-x-clip pl-0"
+      className="relative mt-12 pl-0"
       style={
         {
           "--seg-y": "0px",
@@ -175,33 +162,52 @@ export default function ExperienceRail() {
         } as React.CSSProperties
       }
     >
-      {/* Full-height 2px track */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-[7px] top-0 w-[2px] bg-line md:left-[11px]"
-      >
-        <div
-          data-experience-accent
-          className="absolute left-0 top-0 w-full bg-accent transition-[transform,height] duration-500 ease-[var(--ease-out)]"
-          style={{
-            height: "var(--seg-h)",
-            transform: "translate3d(0, var(--seg-y), 0)",
-          }}
-        />
-      </div>
+      <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-10">
+        <div className="relative min-w-0 lg:col-span-7">
+          {/* Full-height 2px track */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute bottom-0 left-[7px] top-0 w-[2px] bg-line md:left-[11px]"
+          >
+            <div
+              data-experience-accent
+              className="absolute left-0 top-0 w-full bg-accent transition-[transform,height] duration-500 ease-[var(--ease-out)]"
+              style={{
+                height: "var(--seg-h)",
+                transform: "translate3d(0, var(--seg-y), 0)",
+              }}
+            />
+          </div>
 
-      <ul ref={listRef} className="relative">
-        {EXPERIENCE.map((entry, i) => (
-          <Entry
-            key={`${entry.company}-${entry.period}`}
-            entry={entry}
-            index={i}
-            active={active === i}
-            onActive={onActive}
-            setEntryRef={setEntryRef}
+          <ul ref={listRef} className="relative">
+            {EXPERIENCE.map((entry, i) => (
+              <Entry
+                key={`${entry.company}-${entry.period}`}
+                entry={entry}
+                index={i}
+                active={active === i}
+                onActive={onActive}
+                setEntryRef={setEntryRef}
+              />
+            ))}
+          </ul>
+        </div>
+
+        {/*
+          Sticky year particle target. Aspect matches digitFormations SAMPLE.
+          Must NOT sit under overflow-x-clip — that kills position:sticky.
+          Empty — canvas sits under content, so any DOM fill would occlude
+          the Pixi stipple. Organism paints the glyph into this rect.
+        */}
+        <div className="pointer-events-none relative hidden self-stretch lg:col-span-5 lg:block">
+          <div
+            aria-hidden
+            data-experience-year={activeYear || undefined}
+            className="sticky top-[26vh] ml-auto w-full max-w-[520px]"
+            style={{ aspectRatio: `${YEAR_ASPECT}` }}
           />
-        ))}
-      </ul>
+        </div>
+      </div>
     </div>
   );
 }

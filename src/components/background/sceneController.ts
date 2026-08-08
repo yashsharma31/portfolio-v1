@@ -65,9 +65,9 @@ function gatherAnchors(): {
   const lab = qs("[data-lab-grid]") ?? qs("#lab");
   if (lab) motifs.push({ el: lab, scene: "lab" });
 
-  // Prefer the rail/CTA anchors (shorter rects) so tall sections score fairly.
-  const experience =
-    qs("[data-experience-rail]") ?? qs("#experience");
+  // Prefer the section (tall) so Experience keeps ownership while reading entries;
+  // rail alone scores low when only its top edge is in the band.
+  const experience = qs("#experience") ?? qs("[data-experience-rail]");
   if (experience) motifs.push({ el: experience, scene: "experience" });
 
   const writing = qs("[data-writing]") ?? qs("#blog");
