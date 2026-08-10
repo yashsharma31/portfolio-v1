@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 test.describe("writing", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("renders Medium rows or fallback link", async ({ page }) => {
     await page.goto("/");
     await page.locator("#blog").scrollIntoViewIfNeeded();
@@ -24,7 +29,36 @@ test.describe("writing", () => {
   });
 });
 
+test.describe("linkedin", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
+  test("renders archive rows, filters, and profile link", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#linkedin").scrollIntoViewIfNeeded();
+    await expect(
+      page.getByRole("heading", { name: "Thinking out loud on LinkedIn." })
+    ).toBeVisible();
+    await expect(page.locator("[data-linkedin-rows]")).toBeVisible();
+    await expect(page.getByRole("tab", { name: /Articles/i })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Is Prompt Engineering Actually Dead/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /All activity on LinkedIn/i })
+    ).toBeVisible();
+
+    // Posts tab stays disabled until a complete export (Shares.csv) is imported.
+    await expect(page.getByRole("tab", { name: /Posts/i })).toBeDisabled();
+  });
+});
+
 test.describe("about", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("portrait loads and resume link resolves", async ({ page }) => {
     await page.goto("/");
     await page.locator("#about").scrollIntoViewIfNeeded();

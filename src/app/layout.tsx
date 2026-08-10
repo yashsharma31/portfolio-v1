@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Navbar from "@/components/Navbar";
 import GrainOverlay from "@/components/GrainOverlay";
 import EmberFieldMount from "@/components/background/EmberFieldMount";
+import IntroGate from "@/components/intro/IntroGate";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import { metadata } from "./metadata";
 import { CONTACT_LINKS } from "@/utils/constants";
@@ -44,9 +45,19 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${satoshi.variable} ${jetbrainsMono.variable} antialiased`}
+      // Boot script may set data-intro before hydrate (session / hash / reduced-motion).
+      suppressHydrationWarning
     >
       <body>
+        <Script
+          id="intro-boot"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var h=location.hash;var deep=h&&h!=="#"&&h!=="#top";var bypass=sessionStorage.getItem("ember-intro-bypass")==="1";var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;document.documentElement.setAttribute("data-intro",(bypass||deep||reduce)?"done":"pending");}catch(e){document.documentElement.setAttribute("data-intro","pending");}})();`,
+          }}
+        />
         <EmberFieldMount />
+        <IntroGate />
         <Script
           id="schema-org"
           type="application/ld+json"

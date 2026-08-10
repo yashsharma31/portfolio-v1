@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 test.describe("hero", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("artwork is present and organism canvas mounts without errors", async ({
     page,
   }) => {

@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 test.describe("the lab", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("clock renders a live IST time", async ({ page }) => {
     await page.goto("/");
     await page.locator("#lab").scrollIntoViewIfNeeded();

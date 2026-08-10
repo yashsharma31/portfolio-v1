@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 const SECTION_ANCHORS = [
   "top",
@@ -6,11 +7,16 @@ const SECTION_ANCHORS = [
   "lab",
   "experience",
   "blog",
+  "linkedin",
   "about",
   "contact",
 ];
 
 test.describe("portfolio smoke", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("homepage loads without console errors", async ({ page }) => {
     const errors: string[] = [];
     page.on("console", (msg) => {

@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 test.describe("proof bar", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("renders live ribbon and stats, or shipping fallback", async ({
     page,
   }) => {
@@ -8,10 +13,9 @@ test.describe("proof bar", () => {
     const bar = page.locator("[data-proof-bar]");
     await expect(bar).toBeVisible();
     await expect(page.locator("[data-proof-stats]")).toContainText(
-      /shipping since 2022/
+      /shipping since/i
     );
 
-    // Wait for either the ribbon (API success) or confirm fallback only.
     const ribbon = page.locator("[data-proof-ribbon]");
     const appeared = await ribbon
       .waitFor({ state: "visible", timeout: 12_000 })
@@ -20,9 +24,19 @@ test.describe("proof bar", () => {
 
     if (appeared) {
       await expect(page.locator("[data-proof-stats]")).toContainText(
-        /contributions this year/
+        /4-year total/i
       );
-      await expect(page.locator("[data-proof-stats]")).toContainText(/day streak/);
+      await expect(page.locator("[data-proof-stats]")).toContainText(
+        /day streak/i
+      );
+      await expect(page.locator("[data-proof-stats]")).not.toContainText(/NaN/);
+      await expect(page.locator("[data-proof-year-chart]")).toBeVisible();
+      await expect(page.locator("[data-proof-year-chart]")).toContainText(
+        "2023"
+      );
+      await expect(page.locator("[data-proof-year-chart]")).toContainText(
+        "2026"
+      );
     } else {
       await expect(ribbon).toHaveCount(0);
       await expect(page.locator("[data-proof-stats]")).toHaveText(
@@ -48,6 +62,10 @@ test.describe("proof bar", () => {
 });
 
 test.describe("experience", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("renders four timeline entries", async ({ page }) => {
     await page.goto("/");
     await page.locator("#experience").scrollIntoViewIfNeeded();

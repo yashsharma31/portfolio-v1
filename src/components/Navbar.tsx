@@ -12,6 +12,7 @@ const LINKS = [
   { label: "Lab", href: "#lab", id: "lab" },
   { label: "Experience", href: "#experience", id: "experience" },
   { label: "Writing", href: "#blog", id: "blog" },
+  { label: "LinkedIn", href: "#linkedin", id: "linkedin" },
   { label: "About", href: "#about", id: "about" },
 ] as const;
 

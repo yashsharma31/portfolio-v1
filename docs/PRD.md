@@ -199,6 +199,8 @@ Tokens are defined CSS-first in `globals.css` via Tailwind v4 `@theme` (e.g. `--
 > **Addendum (Aug 2026):** an approved ninth section, "Inside the black box" (`#ai`, between Experience and Writing), is specified in `docs/PRD-ai-journey.md`. It amends this table; build only on owner command.
 >
 > **Addendum 2 (Aug 2026):** the site-wide background upgrades to a persistent particle narrator ("the Ember Organism"), specified in `docs/PRD-background-organism.md`. Phased build, each phase on owner command.
+>
+> **Addendum 3 (Aug 2026):** optional session-once loading / starting screen ("First Ember"), specified in `docs/PRD-loading-screen.md`. Concept matrix + recommended C1 Ember Birth; build only after owner locks Section 8 decisions.
 
 Single page, 8 sections, in this exact order. Anchor IDs preserve existing slugs for SEO where a section survives.
 

@@ -91,6 +91,9 @@ p {
   Hero entrance (PRD 6.1): headline lines mask-reveal upward with an 80ms
   stagger, subtext + CTAs fade up after 200ms. Pure CSS: runs off the main
   thread and server-renders the text. One-time only.
+
+  Starts on data-intro="exiting" (under the sliding cover) so the handoff is a
+  curtain reveal, not a pop. Boot script sets done|pending before paint.
 */
 .hero-line {
   display: block;
@@ -100,13 +103,26 @@ p {
 .hero-line-inner {
   display: block;
   transform: translateY(110%);
-  animation: hero-rise 600ms var(--ease-out) forwards;
 }
 
 .hero-fade {
   opacity: 0;
   transform: translateY(16px);
-  animation: hero-fade-up 600ms var(--ease-out) 200ms forwards;
+}
+
+html[data-intro="exiting"] .hero-line-inner,
+html[data-intro="done"] .hero-line-inner {
+  animation: hero-rise 700ms var(--ease-out) forwards;
+}
+
+html[data-intro="exiting"] .hero-line-inner.hero-line-delay,
+html[data-intro="done"] .hero-line-inner.hero-line-delay {
+  animation-delay: 90ms;
+}
+
+html[data-intro="exiting"] .hero-fade,
+html[data-intro="done"] .hero-fade {
+  animation: hero-fade-up 700ms var(--ease-out) 180ms forwards;
 }
 
 @keyframes hero-rise {
@@ -125,10 +141,43 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .hero-line-inner,
   .hero-fade {
-    animation: none;
+    animation: none !important;
     transform: none;
     opacity: 1;
   }
+}
+
+/*
+  Intro ↔ hero handoff: pending hides main (no flash before cover mounts).
+  Transition lives on both states so pending→exiting actually tweens
+  (browsers skip the tween if transition only appears on the destination rule).
+  Duration matches INTRO.exit (850ms) — cover slides up while main fades in.
+*/
+main {
+  transition: opacity 850ms var(--ease-in-out);
+}
+
+header {
+  transition: opacity 850ms var(--ease-out);
+}
+
+html[data-intro="pending"] header {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-intro="pending"] main {
+  opacity: 0;
+}
+
+html[data-intro="exiting"] header,
+html[data-intro="done"] header {
+  opacity: 1;
+}
+
+html[data-intro="exiting"] main,
+html[data-intro="done"] main {
+  opacity: 1;
 }
 
 /* Hover motion only on fine pointers (PRD 3.5) */

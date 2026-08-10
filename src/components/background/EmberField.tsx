@@ -1066,6 +1066,7 @@ export default function EmberField() {
           resizeTo: window,
         });
       } catch {
+        fieldControl.ready = true;
         return;
       }
       if (destroyed) {
@@ -1499,14 +1500,18 @@ export default function EmberField() {
       );
 
       if (document.hidden) application.ticker.stop();
+
+      fieldControl.ready = true;
     }
 
     build().catch(() => {
       console.warn("[EmberField] WebGL unavailable");
+      fieldControl.ready = true;
     });
 
     return () => {
       destroyed = true;
+      fieldControl.ready = false;
       stopController?.();
       stopController = null;
       aborts.forEach((fn) => fn());

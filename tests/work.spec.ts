@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { bypassIntro } from "./helpers/intro";
 
 test.describe("selected work", () => {
+  test.beforeEach(async ({ page }) => {
+    await bypassIntro(page);
+  });
+
   test("renders three chapters with loaded images", async ({ page }) => {
     const failed: string[] = [];
     page.on("response", (res) => {

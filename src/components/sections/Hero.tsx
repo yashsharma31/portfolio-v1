@@ -8,7 +8,11 @@ import Magnetic from "@/components/motion/Magnetic";
  */
 export default function Hero() {
   return (
-    <section id="top" className="relative flex min-h-[100dvh] items-center overflow-hidden">
+    <section
+      id="top"
+      tabIndex={-1}
+      className="relative flex min-h-[100dvh] items-center overflow-hidden outline-none"
+    >
       <HeroVisual />
       <div
         className="relative mx-auto w-full max-w-[1200px] px-5 md:px-8"
@@ -20,7 +24,7 @@ export default function Hero() {
               <span className="hero-line-inner">I build editors, canvases,</span>
             </span>
             <span className="hero-line">
-              <span className="hero-line-inner [animation-delay:80ms]">
+              <span className="hero-line-inner hero-line-delay">
                 and interfaces that <span className="text-accent">feel fast.</span>
               </span>
             </span>
